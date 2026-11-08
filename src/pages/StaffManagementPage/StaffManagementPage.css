@@ -1,0 +1,128 @@
+.staff-page { display: grid; gap: 1rem; padding-block: 0.3rem 2rem; }
+.staff-page__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.staff-page__heading > div:first-child { display: grid; gap: 0.25rem; }
+.staff-page__eyebrow.MuiTypography-root { color: #b17a2e; font-size: 0.63rem; font-weight: 850; letter-spacing: 0.12em; }
+.staff-page__heading h1.MuiTypography-root { color: #202a3d; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 850; line-height: 1.15; }
+.staff-page__heading > div > p:last-child { color: #8992a0; font-size: 0.75rem; }
+.staff-page__demo-note.MuiAlert-root { font-size: 0.68rem; }
+.staff-page__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+.staff-stat.MuiCard-root { display: flex; min-width: 0; align-items: center; gap: 0.75rem; padding: 0.9rem; border: 1px solid #e6eaf0; border-radius: 0.8rem; }
+.staff-stat__icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 0.7rem; background: #edf2fb; color: #5e78a5; }
+.staff-stat.is-profit .staff-stat__icon { background: #edf7ef; color: #378153; }
+.staff-stat.is-share .staff-stat__icon { background: #fff4e8; color: #bc7c30; }
+.staff-stat.is-wallet .staff-stat__icon { background: #f3edfa; color: #8062a4; }
+.staff-stat__icon .MuiSvgIcon-root { font-size: 1.2rem; }
+.staff-stat > div:last-child { display: grid; min-width: 0; gap: 0.1rem; }
+.staff-stat p.MuiTypography-root { color: #808b9a; font-size: 0.63rem; font-weight: 650; }
+.staff-stat strong { overflow: hidden; color: #2e3b50; font-size: clamp(1rem, 1.8vw, 1.3rem); font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.staff-stat span { overflow: hidden; color: #929ba7; font-size: 0.58rem; text-overflow: ellipsis; white-space: nowrap; }
+.staff-page__workspace.MuiCard-root { min-width: 0; overflow: hidden; border: 1px solid #e5e9ef; border-radius: 0.85rem; }
+.staff-page__workspace-header { display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 1rem; border-bottom: 1px solid #ebeff3; }
+.staff-page__workspace-header .MuiTabs-root { min-height: 52px; }
+.staff-page__workspace-header .MuiTab-root { min-height: 52px; font-size: 0.7rem; font-weight: 750; text-transform: none; }
+.staff-page__filters { display: flex; gap: 0.6rem; }
+.staff-page__filters .MuiTextField-root { width: 190px; }
+.staff-page__filters .MuiFormControl-root { width: 130px; }
+.staff-table-wrap { overflow-x: auto; }
+.staff-table { min-width: 960px; }
+.staff-table__head,
+.staff-table__row { display: grid; grid-template-columns: minmax(185px, 1.4fr) minmax(170px, 1.2fr) 90px 100px 115px minmax(205px, 1.5fr); align-items: center; gap: 0.55rem; padding: 0.7rem 1rem; }
+.staff-table__head { border-bottom: 1px solid #ebeff3; color: #8490a0; font-size: 0.57rem; font-weight: 850; letter-spacing: 0.06em; }
+.staff-table__row { min-height: 68px; border-bottom: 1px solid #f0f2f5; color: #536076; font-size: 0.65rem; }
+.staff-table__row:last-child { border-bottom: 0; }
+.staff-table__person,
+.staff-share__person,
+.staff-wallet-card__person { display: flex; min-width: 0; align-items: center; gap: 0.55rem; }
+.staff-table__person .MuiAvatar-root,
+.staff-share__person .MuiAvatar-root,
+.staff-wallet-card__person .MuiAvatar-root { width: 34px; height: 34px; background: #e9eef8; color: #536d9a; font-size: 0.7rem; font-weight: 800; }
+.staff-table__person > div:last-child,
+.staff-wallet-card__person > div:last-child { display: grid; min-width: 0; gap: 0.15rem; }
+.staff-table__person strong,
+.staff-share__person strong,
+.staff-wallet-card__person strong { overflow: hidden; color: #344156; font-size: 0.68rem; text-overflow: ellipsis; white-space: nowrap; }
+.staff-table__person span,
+.staff-wallet-card__person span { overflow: hidden; color: #8993a2; font-size: 0.58rem; text-overflow: ellipsis; white-space: nowrap; }
+.staff-table__roles { display: flex; flex-wrap: wrap; gap: 0.2rem; }
+.staff-table__roles .MuiChip-root { height: 21px; background: #f1f3f7; color: #5d6a80; font-size: 0.57rem; }
+.staff-status.MuiChip-root { width: max-content; height: 22px; background: #edf7ef; color: #34794a; font-size: 0.57rem; font-weight: 750; }
+.staff-status.is-invited.MuiChip-root { background: #fff5e5; color: #95651e; }
+.staff-status.is-inactive.MuiChip-root { background: #f0f2f5; color: #737d8c; }
+.staff-table__row > strong { color: #435169; font-size: 0.67rem; }
+.staff-table__actions { display: flex; flex-wrap: wrap; gap: 0.05rem; }
+.staff-table__actions .MuiButton-root { min-width: 0; padding: 0.15rem 0.35rem; font-size: 0.58rem; }
+.staff-page__empty { display: grid; min-height: 255px; justify-items: center; align-content: center; gap: 0.6rem; padding: 1.5rem; text-align: center; }
+.staff-page__empty > .MuiAvatar-root { width: 48px; height: 48px; margin-bottom: 0.2rem; background: #eff3f8; color: #6a7f9f; }
+.staff-page__empty h2.MuiTypography-root { color: #354156; font-size: 0.95rem; font-weight: 850; }
+.staff-page__empty p.MuiTypography-root { max-width: 440px; color: #8792a0; font-size: 0.69rem; }
+.staff-page__loading { display: flex; min-height: 220px; align-items: center; justify-content: center; gap: 0.7rem; color: #788493; }
+.staff-dialog__content { display: grid; gap: 1rem; padding-top: 0.75rem !important; }
+.staff-dialog__two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.staff-dialog__roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.staff-dialog__roles .MuiFormControlLabel-label { color: #536076; font-size: 0.7rem; }
+.staff-dialog__note.MuiTypography-root { color: #8992a0; font-size: 0.63rem; line-height: 1.5; }
+.staff-share,
+.staff-wallets { display: grid; gap: 1rem; padding: 1rem; }
+.staff-share__summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(190px, 0.65fr); align-items: center; gap: 1rem; padding: 1rem; border-radius: 0.75rem; background: linear-gradient(110deg, #202a3d, #315c4d); color: #fff; }
+.staff-share__summary > div { display: grid; gap: 0.22rem; }
+.staff-share__summary > div + div { padding-left: 1rem; border-left: 1px solid rgb(255 255 255 / 18%); }
+.staff-share__summary p.MuiTypography-root { color: #d4dfd9; font-size: 0.57rem; font-weight: 850; letter-spacing: 0.08em; }
+.staff-share__summary strong { color: #fff; font-size: 1.35rem; font-weight: 850; }
+.staff-share__summary span { color: #c4d1cb; font-size: 0.58rem; }
+.staff-share__summary .MuiTextField-root { background: white; border-radius: 10px; }
+.staff-share__date { display: grid; gap: 0.25rem; padding-left: 1rem; border-left: 1px solid rgb(255 255 255 / 18%); }
+.staff-share__date p.MuiTypography-root { color: #d4dfd9; font-size: 0.57rem; font-weight: 850; letter-spacing: 0.08em; }
+.staff-share__date strong { color: #fff; font-size: 0.85rem; }
+.staff-share__date .MuiButton-root { justify-self: start; color: #f7d47b; font-size: 0.6rem; }
+.staff-share > .MuiAlert-root,
+.staff-wallets > .MuiAlert-root { font-size: 0.66rem; }
+.staff-share__table { overflow-x: auto; }
+.staff-share__head,
+.staff-share__row,
+.staff-share__footer { display: grid; min-width: 650px; grid-template-columns: minmax(160px, 1.2fr) minmax(130px, 1fr) 70px minmax(125px, 1fr) minmax(100px, 0.8fr); align-items: center; gap: 0.6rem; padding: 0.6rem 0.4rem; }
+.staff-share__head { border-bottom: 1px solid #e8edf2; color: #8792a0; font-size: 0.57rem; font-weight: 850; }
+.staff-share__row { min-height: 55px; border-bottom: 1px solid #f0f2f5; color: #68758a; font-size: 0.64rem; }
+.staff-share__row > strong { color: #35445c; font-size: 0.66rem; }
+.staff-share__footer { border-top: 1px solid #e6eaf0; color: #667287; font-size: 0.64rem; }
+.staff-share__footer strong { color: #2e3b50; }
+.staff-share__actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 0.5rem; border-top: 1px solid #edf0f3; }
+.staff-share__actions p.MuiTypography-root { color: #7d8897; font-size: 0.64rem; }
+.staff-wallets__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.7rem; }
+.staff-wallet-card.MuiCard-root { display: grid; gap: 0.55rem; padding: 0.85rem; border: 1px solid #e7ebf0; border-radius: 0.75rem; }
+.staff-wallet-card > p.MuiTypography-root { color: #8992a0; font-size: 0.61rem; }
+.staff-wallet-card__balance { color: #2d4056; font-size: 1.15rem; }
+.staff-ledger { display: grid; gap: 0.4rem; padding-top: 0.3rem; }
+.staff-ledger h2.MuiTypography-root { margin-bottom: 0.3rem; color: #354156; font-size: 0.85rem; font-weight: 850; }
+.staff-ledger__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid #edf0f3; }
+.staff-ledger__row > div { display: grid; gap: 0.15rem; }
+.staff-ledger__row > div strong { color: #435169; font-size: 0.67rem; }
+.staff-ledger__row > div span { color: #8792a0; font-size: 0.6rem; }
+.staff-ledger__row > strong { font-size: 0.7rem; white-space: nowrap; }
+.staff-ledger__row > strong.is-credit { color: #25834a; }
+.staff-ledger__row > strong.is-debit { color: #b34d43; }
+.staff-ledger__empty.MuiTypography-root { color: #8792a0; font-size: 0.66rem; }
+
+@media (max-width: 900px) {
+  .staff-page__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .staff-page__workspace-header { align-items: flex-start; flex-direction: column; padding-top: 0.5rem; }
+  .staff-page__filters { width: 100%; }
+  .staff-page__filters .MuiTextField-root { flex: 1; }
+  .staff-share__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .staff-share__summary .staff-share__date { grid-column: 1 / -1; padding: 0; border: 0; }
+}
+
+@media (max-width: 560px) {
+  .staff-page__heading { align-items: flex-start; flex-direction: column; }
+  .staff-page__heading > .MuiButton-root { width: 100%; }
+  .staff-page__stats { grid-template-columns: minmax(0, 1fr); }
+  .staff-page__workspace-header .MuiTabs-root { width: 100%; }
+  .staff-page__workspace-header .MuiTab-root { min-width: 0; flex: 1; padding-inline: 0.3rem; font-size: 0.63rem; }
+  .staff-page__filters { flex-direction: column; }
+  .staff-page__filters .MuiTextField-root,
+  .staff-page__filters .MuiFormControl-root { width: 100%; }
+  .staff-dialog__two-col { grid-template-columns: minmax(0, 1fr); }
+  .staff-dialog__roles { grid-template-columns: minmax(0, 1fr); }
+  .staff-share__summary { grid-template-columns: minmax(0, 1fr); }
+  .staff-share__summary > div + div { padding: 0; border: 0; }
+  .staff-share__actions { align-items: stretch; flex-direction: column; }
+}

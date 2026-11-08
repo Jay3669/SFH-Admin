@@ -1,0 +1,64 @@
+.action-button-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.MuiIconButton-root.action-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.MuiIconButton-root.action-button .MuiSvgIcon-root {
+  width: 18px;
+  height: 18px;
+}
+
+.action-button--view {
+  color: #2878b8 !important;
+  background: rgba(40, 120, 184, .09) !important;
+}
+
+.action-button--view:hover {
+  border-color: rgba(40, 120, 184, .24);
+  background: rgba(40, 120, 184, .16) !important;
+}
+
+.action-button--edit {
+  color: #73500a !important;
+  background: rgba(252, 169, 48, .13) !important;
+}
+
+.action-button--edit:hover {
+  border-color: rgba(252, 169, 48, .32);
+  background: rgba(252, 169, 48, .22) !important;
+}
+
+.action-button--delete {
+  color: #c94242 !important;
+  background: rgba(201, 66, 66, .09) !important;
+}
+
+.action-button--delete:hover {
+  border-color: rgba(201, 66, 66, .28);
+  background: rgba(201, 66, 66, .16) !important;
+}
+
+.standard-action-button--add.MuiButton-root {
+  background: linear-gradient(135deg, #fde081, #fca930 55%, #f47b20) !important;
+  color: #131627 !important;
+}
+
+.standard-action-button--download.MuiButton-root,
+.standard-action-button--print.MuiButton-root {
+  border-color: var(--border-color) !important;
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-admin-theme="dark"] .action-button--view { color: #82c5ff !important; }
+[data-admin-theme="dark"] .action-button--edit { color: #fde081 !important; }
+[data-admin-theme="dark"] .action-button--delete { color: #ff9b9b !important; }

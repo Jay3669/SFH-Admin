@@ -1,0 +1,23 @@
+.profile-page { display: grid; gap: 1rem; }
+.profile-page__heading h1.MuiTypography-root { font-size: clamp(1.55rem,3vw,2rem); font-weight: 850; }
+.profile-page__eyebrow.MuiTypography-root { color: #c0750d; font-size: .63rem; font-weight: 850; letter-spacing:.12em; }
+.profile-page__heading > div:last-child p:last-child { color: var(--text-secondary); font-size:.75rem; }
+.profile-page__layout { display:grid; grid-template-columns:260px minmax(0,1fr); align-items:start; gap:1rem; }
+.profile-summary.MuiCard-root, .profile-card.MuiCard-root { padding:1.25rem; }
+.profile-summary.MuiCard-root { display:grid; justify-items:center; gap:.65rem; text-align:center; }
+.profile-summary .MuiAvatar-root { width:82px; height:82px; background:linear-gradient(135deg,#FDE081,#FCA930,#F47B20); color:#131627; font-size:1.6rem; font-weight:850; }
+.profile-summary h2 { font-weight:850; }
+.profile-summary .MuiDivider-root { width:100%; margin:.35rem 0; }
+.profile-content { display:grid; gap:1rem; }
+.profile-card__heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.profile-card__heading > div { display:flex; align-items:center; gap:.75rem; }
+.profile-card__heading > div > .MuiSvgIcon-root { width:42px; height:42px; padding:.55rem; border-radius:12px; background:#fff1d8; color:#c06c0a; overflow:visible; }
+.profile-card__heading .MuiIconButton-root { color:#b7791f; }
+.profile-card__heading h2 { font-size:.95rem; font-weight:850; }
+.profile-card__heading p { color:var(--text-secondary); font-size:.66rem; }
+.profile-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.9rem; margin-top:1rem; }
+.profile-card__actions { display:flex; justify-content:flex-end; gap:.5rem; margin-top:.9rem; }
+.profile-theme-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:1rem; padding:.85rem; border-radius:.7rem; background:var(--background); }
+.profile-theme-row div p:last-child { margin-top:.15rem; color:var(--text-secondary); font-size:.65rem; }
+.profile-password-dialog { display:grid !important; gap:.85rem; padding-top:.75rem !important; }
+@media (max-width:767px) { .profile-page__layout { grid-template-columns:1fr; } .profile-fields { grid-template-columns:1fr; } }

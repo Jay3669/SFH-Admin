@@ -1,0 +1,298 @@
+:root {
+  --brand-primary: #14172a;
+  --brand-secondary: #252b42;
+  --brand-gold: #ffd45a;
+  --brand-orange: #ff941f;
+  --brand-green: #68b83d;
+  --background: #f5f3ed;
+  --surface: #ffffff;
+  --text-primary: #14172a;
+  --text-secondary: #6b7080;
+  --border-color: #e5e9f0;
+  --gradient-primary: linear-gradient(110deg, #ffe477, #ffb52e, #f47716);
+  --gradient-navy: linear-gradient(135deg, #30364d, #14172a, #090d1c);
+  --gradient-golden: linear-gradient(120deg, #fff8e9, #ffe8b5, #ffd45a);
+  --gradient-green: linear-gradient(110deg, #a4d65e, #68b83d, #25834a);
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1440px;
+  --breakpoint-xxl: 1920px;
+}
+
+html {
+  color-scheme: light;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+[data-admin-theme="dark"] {
+  --brand-primary: #131627;
+  --brand-secondary: #23283b;
+  --background: #131627;
+  --surface: #23283b;
+  --text-primary: #ffffff;
+  --text-secondary: #c5c7d0;
+  --border-color: #404858;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 180ms;
+  transition-timing-function: ease;
+}
+
+[data-admin-theme="dark"] .admin-shell {
+  background: var(--background);
+}
+
+[data-admin-theme="dark"] .admin-header.MuiAppBar-root {
+  border-bottom-color: var(--border-color);
+  background: rgb(35 40 59 / 96%);
+  color: #fff;
+}
+
+[data-admin-theme="dark"] .admin-header__title .MuiTypography-caption,
+[data-admin-theme="dark"] .admin-header__account-details .MuiTypography-caption {
+  color: var(--text-secondary);
+}
+
+[data-admin-theme="dark"] .admin-header__account-details .MuiTypography-root:first-child {
+  color: #fff;
+}
+
+[data-admin-theme="dark"] .MuiCard-root,
+[data-admin-theme="dark"] .MuiPaper-root:not(.MuiDialog-paper):not(.MuiDrawer-paper):not(.MuiAppBar-root),
+[data-admin-theme="dark"] .MuiTableContainer-root {
+  background-color: var(--surface);
+}
+
+[data-admin-theme="dark"] .MuiTableCell-root {
+  border-bottom-color: var(--border-color);
+}
+
+[data-admin-theme="dark"] .MuiTableHead-root {
+  background-color: #303646;
+}
+
+[data-admin-theme="dark"] .dashboard-hero,
+[data-admin-theme="dark"] .dashboard-inventory-alerts > div,
+[data-admin-theme="dark"] .dashboard-order-list > div,
+[data-admin-theme="dark"] .dashboard-payment-track {
+  border-color: var(--border-color);
+  background: var(--surface);
+}
+
+[data-admin-theme="dark"] .dashboard-inventory-alerts span {
+  color: var(--brand-gold);
+}
+
+[data-admin-theme="dark"] .dashboard-track,
+[data-admin-theme="dark"] .MuiBackdrop-root {
+  background-color: rgb(5 7 15 / 72%);
+}
+
+[data-admin-theme="dark"] .MuiMenu-paper,
+[data-admin-theme="dark"] .MuiPopover-paper {
+  border: 1px solid var(--border-color);
+  background-color: var(--surface);
+  background-image: none;
+}
+
+[data-admin-theme="dark"] .MuiTooltip-tooltip {
+  border: 1px solid var(--border-color);
+  background-color: #303646;
+  color: #fff;
+}
+
+[data-admin-theme="dark"] input:-webkit-autofill,
+[data-admin-theme="dark"] input:-webkit-autofill:hover,
+[data-admin-theme="dark"] input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  caret-color: var(--text-primary);
+}
+
+/* Menu Management dark-theme surfaces */
+[data-admin-theme="dark"] .menu-summary-card.MuiCard-root,
+[data-admin-theme="dark"] .menu-management__toolbar,
+[data-admin-theme="dark"] .menu-management__tabs.MuiTabs-root,
+[data-admin-theme="dark"] .menu-item-card.MuiCard-root,
+[data-admin-theme="dark"] .category-management__card.MuiCard-root,
+[data-admin-theme="dark"] .menu-empty-state.MuiCard-root,
+[data-admin-theme="dark"] .category-management__empty.MuiCard-root {
+  border-color: var(--border-color) !important;
+  background: var(--surface) !important;
+  color: var(--text-primary);
+}
+
+[data-admin-theme="dark"] .menu-management__tabs .MuiTab-root {
+  color: var(--text-secondary);
+}
+
+[data-admin-theme="dark"] .menu-management__tabs .MuiTab-root.Mui-selected {
+  background: color-mix(in srgb, var(--brand-gold) 18%, var(--surface));
+  color: var(--brand-gold);
+}
+
+[data-admin-theme="dark"] .menu-item-card__name.MuiTypography-root,
+[data-admin-theme="dark"] .menu-item-card__price.MuiTypography-root,
+[data-admin-theme="dark"] .menu-item-card__description.MuiTypography-root,
+[data-admin-theme="dark"] .menu-item-card__availability-control .MuiTypography-root,
+[data-admin-theme="dark"] .menu-management__section-heading h2.MuiTypography-root,
+[data-admin-theme="dark"] .menu-summary-card__value.MuiTypography-root,
+[data-admin-theme="dark"] .menu-summary-card__label.MuiTypography-root,
+[data-admin-theme="dark"] .category-management__card .MuiTypography-root {
+  color: var(--text-primary) !important;
+}
+
+[data-admin-theme="dark"] .menu-item-card__description.MuiTypography-root,
+[data-admin-theme="dark"] .menu-summary-card__label.MuiTypography-root {
+  color: var(--text-secondary) !important;
+}
+
+[data-admin-theme="dark"] .menu-management__toolbar .MuiOutlinedInput-root,
+[data-admin-theme="dark"] .menu-management__search .MuiOutlinedInput-root {
+  border-color: var(--border-color);
+  background: #303646;
+}
+
+[data-admin-theme="dark"] .menu-management__toolbar .MuiInputBase-input,
+[data-admin-theme="dark"] .menu-management__toolbar .MuiSelect-select,
+[data-admin-theme="dark"] .menu-management__toolbar .MuiInputLabel-root {
+  color: var(--text-primary);
+}
+
+[data-admin-theme="dark"] .MuiTableRow-root:hover {
+  background-color: rgb(255 255 255 / 4%);
+}
+
+[data-admin-theme="dark"] [class*="__card"],
+[data-admin-theme="dark"] [class*="__panel"],
+[data-admin-theme="dark"] [class*="__workspace"],
+[data-admin-theme="dark"] [class*="__section"],
+[data-admin-theme="dark"] [class*="__dialog-content"] {
+  border-color: var(--border-color);
+}
+
+[data-admin-theme="dark"] .admin-shell__content [class*="__card"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__panel"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__workspace"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__section"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__form"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__directory"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__profile"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__details"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__table-wrap"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__inbox"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__ticket"] {
+  background-color: var(--surface) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-admin-theme="dark"] .admin-shell__content [class*="date-strip"],
+[data-admin-theme="dark"] .admin-shell__content [class*="-inbox"],
+[data-admin-theme="dark"] .admin-shell__content [class*="-stat.MuiCard"],
+[data-admin-theme="dark"] .admin-shell__content [class*="-list"] .MuiCard-root,
+[data-admin-theme="dark"] .admin-shell__content [class*="__totals"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__preview"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__editor"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__ledger"],
+[data-admin-theme="dark"] .admin-shell__content [class*="__details"] {
+  background-color: var(--surface) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-admin-theme="dark"] .admin-shell__content h1,
+[data-admin-theme="dark"] .admin-shell__content h2,
+[data-admin-theme="dark"] .admin-shell__content h3,
+[data-admin-theme="dark"] .admin-shell__content h4,
+[data-admin-theme="dark"] .admin-shell__content strong {
+  color: var(--text-primary);
+}
+
+[data-admin-theme="dark"] .admin-shell__content {
+  color: var(--text-primary);
+}
+
+[data-admin-theme="dark"] .admin-shell__content p,
+[data-admin-theme="dark"] .admin-shell__content small,
+[data-admin-theme="dark"] .admin-shell__content span {
+  color: inherit;
+}
+
+/* Prevent page-level light-theme text styles from surviving in dark mode. */
+[data-admin-theme="dark"] .admin-shell__content .MuiTypography-root:not(.MuiChip-label),
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="-page"]:not([class*="status"]):not([class*="chip"]) div,
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="-page"]:not([class*="status"]):not([class*="chip"]) strong {
+  color: var(--text-primary) !important;
+}
+
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="-stat"] p,
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__range"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__meta"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__note"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__caption"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__description"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__subtitle"] {
+  color: var(--text-secondary) !important;
+}
+
+/* Project-wide dark text recovery for page-specific light-theme selectors. */
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__title"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__name"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__heading"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__label"]:not(.MuiChip-root):not(.MuiButton-root),
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__value"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__person"] strong {
+  color: var(--text-primary) !important;
+}
+
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__subtitle"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__description"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__meta"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__caption"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__detail"] {
+  color: var(--text-secondary) !important;
+}
+
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__toolbar"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__header"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__filters"],
+[data-admin-theme="dark"] .admin-shell__content
+  [class*="__row"]:not([class*="table"]) {
+  border-color: var(--border-color);
+}
+
+[data-admin-theme="dark"] .admin-shell__content
+  .MuiChip-root:not(.MuiChip-colorError):not(.MuiChip-colorSuccess):not(.MuiChip-colorWarning),
+[data-admin-theme="dark"] .admin-shell__content
+  .MuiAvatar-root {
+  color: var(--text-primary);
+}

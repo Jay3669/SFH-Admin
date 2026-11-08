@@ -1,0 +1,31 @@
+.session-expired-dialog .MuiDialog-paper {
+  overflow: hidden;
+  border: 1px solid #f0e2c9;
+  border-radius: 1rem;
+  box-shadow: 0 24px 70px rgb(28 37 54 / 22%);
+}
+
+.session-expired-dialog .MuiDialogTitle-root {
+  padding: 1.5rem 1.5rem 0.6rem;
+  color: #202a3b;
+  font-family: "Manrope", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.session-expired-dialog .MuiDialogContent-root {
+  padding: 0.2rem 1.5rem 0.75rem;
+  color: #687386;
+  line-height: 1.65;
+}
+
+.session-expired-dialog .MuiDialogActions-root {
+  padding: 0.6rem 1.5rem 1.4rem;
+}
+
+.session-expired-dialog .MuiButton-root {
+  min-width: 6rem;
+  min-height: 40px;
+  border-radius: 0.7rem;
+  font-weight: 700;
+}

@@ -1,0 +1,95 @@
+.customer-page { display: grid; gap: 1rem; padding-block: 0.3rem 2rem; }
+.customer-page__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.customer-page__heading > div:first-child { display: grid; gap: 0.25rem; }
+.customer-page__eyebrow.MuiTypography-root { color: #b17a2e; font-size: 0.63rem; font-weight: 850; letter-spacing: 0.12em; }
+.customer-page__heading h1.MuiTypography-root { color: #202a3d; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 850; line-height: 1.15; }
+.customer-page__heading > div > p:last-child { color: #8992a0; font-size: 0.75rem; }
+.customer-page__demo-note.MuiAlert-root { font-size: 0.68rem; }
+.customer-page__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+.customer-stat.MuiCard-root { display: flex; min-width: 0; align-items: center; gap: 0.75rem; padding: 0.9rem; border: 1px solid #e6eaf0; border-radius: 0.8rem; }
+.customer-stat__icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 0.7rem; background: #edf2fb; color: #5e78a5; }
+.customer-stat.is-visits .customer-stat__icon { background: #edf7ef; color: #378153; }
+.customer-stat.is-spend .customer-stat__icon { background: #fff4e8; color: #bc7c30; }
+.customer-stat.is-recent .customer-stat__icon { background: #f3edfa; color: #8062a4; }
+.customer-stat__icon .MuiSvgIcon-root { font-size: 1.2rem; }
+.customer-stat > div:last-child { display: grid; min-width: 0; gap: 0.1rem; }
+.customer-stat p.MuiTypography-root { color: #808b9a; font-size: 0.63rem; font-weight: 650; }
+.customer-stat strong { overflow: hidden; color: #2e3b50; font-size: clamp(1rem, 1.8vw, 1.3rem); font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.customer-stat span { color: #929ba7; font-size: 0.58rem; }
+.customer-workspace { display: grid; grid-template-columns: minmax(265px, 0.75fr) minmax(0, 1.65fr); align-items: start; gap: 0.85rem; }
+.customer-directory.MuiCard-root,
+.customer-profile.MuiCard-root { min-width: 0; padding: 1rem; border: 1px solid #e5e9ef; border-radius: 0.85rem; }
+.customer-directory.MuiCard-root { display: grid; gap: 0.75rem; }
+.customer-directory__heading { display: flex; align-items: center; justify-content: space-between; }
+.customer-directory__heading h2.MuiTypography-root { color: #344156; font-size: 0.87rem; font-weight: 850; }
+.customer-directory__heading p.MuiTypography-root { color: #8a94a2; font-size: 0.62rem; }
+.customer-directory > .MuiTextField-root .MuiInputAdornment-root { margin-right: 0.4rem; color: #8792a0; }
+.customer-directory__list { display: grid; max-height: 560px; gap: 0.25rem; overflow: auto; }
+.customer-directory__item.MuiButton-root { display: flex; min-width: 0; justify-content: flex-start; gap: 0.55rem; padding: 0.55rem; border-radius: 0.65rem; text-align: left; }
+.customer-directory__item.MuiButton-root:hover,
+.customer-directory__item.is-selected.MuiButton-root { background: #f1f4f9; }
+.customer-directory__item .MuiAvatar-root { width: 34px; height: 34px; background: #e9eef8; color: #536d9a; font-size: 0.7rem; font-weight: 800; }
+.customer-directory__item > div:nth-of-type(1) { display: grid; min-width: 0; flex: 1; gap: 0.1rem; }
+.customer-directory__item > div:nth-of-type(1) strong { overflow: hidden; color: #3a485e; font-size: 0.68rem; text-overflow: ellipsis; white-space: nowrap; }
+.customer-directory__item > div:nth-of-type(1) span { color: #8792a0; font-size: 0.59rem; }
+.customer-directory__item .MuiChip-root { height: 20px; background: #edf7ef; color: #428051; font-size: 0.53rem; }
+.customer-directory__empty { display: grid; min-height: 155px; justify-items: center; align-content: center; gap: 0.35rem; color: #8792a0; text-align: center; }
+.customer-directory__empty > .MuiSvgIcon-root { color: #9aa5b3; font-size: 1.6rem; }
+.customer-directory__empty p.MuiTypography-root { font-size: 0.63rem; }
+.customer-profile.MuiCard-root { display: grid; gap: 1.1rem; }
+.customer-profile__header { display: flex; min-width: 0; align-items: center; gap: 0.75rem; }
+.customer-profile__header > .MuiAvatar-root { width: 52px; height: 52px; background: #e9eef8; color: #536d9a; font-size: 1rem; font-weight: 850; }
+.customer-profile__header > div:nth-of-type(1) { display: grid; min-width: 0; flex: 1; gap: 0.15rem; }
+.customer-profile__header h2.MuiTypography-root { overflow: hidden; color: #344156; font-size: 1rem; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.customer-profile__header > div > p.MuiTypography-root { color: #8992a0; font-size: 0.62rem; }
+.customer-profile__actions { display: flex; gap: 0.2rem; }
+.customer-profile__actions .MuiButton-root { min-width: 0; padding-inline: 0.4rem; font-size: 0.63rem; }
+.customer-profile__contact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; padding: 0.8rem 0; border-block: 1px solid #edf0f3; }
+.customer-profile__contact > div { display: grid; min-width: 0; gap: 0.2rem; }
+.customer-profile__contact span { color: #8992a0; font-size: 0.56rem; font-weight: 850; letter-spacing: 0.07em; }
+.customer-profile__contact a,
+.customer-profile__contact strong { overflow: hidden; color: #47556c; font-size: 0.65rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.customer-profile__contact a { text-decoration: none; }
+.customer-profile__contact a:hover { color: #ad702d; text-decoration: underline; }
+.customer-profile__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.customer-profile__stats > div { display: grid; gap: 0.2rem; padding: 0.65rem; border-radius: 0.6rem; background: #f7f8fa; }
+.customer-profile__stats p.MuiTypography-root { color: #8792a0; font-size: 0.6rem; }
+.customer-profile__stats strong { color: #344156; font-size: 0.85rem; font-weight: 850; }
+.customer-profile__section { display: grid; gap: 0.45rem; }
+.customer-profile__section-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.customer-profile__section-heading h3.MuiTypography-root { color: #3b4960; font-size: 0.73rem; font-weight: 850; }
+.customer-profile__section-heading > .MuiSvgIcon-root { color: #b48651; font-size: 1rem; }
+.customer-profile__section > p.MuiTypography-root { color: #748093; font-size: 0.65rem; line-height: 1.55; white-space: pre-wrap; }
+.customer-profile__section-heading .MuiButton-root { font-size: 0.61rem; }
+.customer-profile__empty-history.MuiTypography-root { padding: 0.7rem; border-radius: 0.5rem; background: #f8f9fb; }
+.customer-visit { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid #f0f2f5; }
+.customer-visit > div { display: grid; gap: 0.15rem; }
+.customer-visit > div strong,
+.customer-visit > strong { color: #4a5870; font-size: 0.66rem; }
+.customer-visit > div span { color: #8992a0; font-size: 0.6rem; }
+.customer-profile__empty { display: grid; min-height: 410px; justify-items: center; align-content: center; gap: 0.55rem; text-align: center; }
+.customer-profile__empty > .MuiAvatar-root { width: 52px; height: 52px; margin-bottom: 0.2rem; background: #eff3f8; color: #6a7f9f; }
+.customer-profile__empty h2.MuiTypography-root { color: #354156; font-size: 0.95rem; font-weight: 850; }
+.customer-profile__empty p.MuiTypography-root { max-width: 390px; color: #8792a0; font-size: 0.68rem; line-height: 1.5; }
+.customer-dialog__content { display: grid; gap: 1rem; padding-top: 0.75rem !important; }
+.customer-dialog__two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.customer-dialog__note.MuiTypography-root { color: #8992a0; font-size: 0.63rem; line-height: 1.5; }
+
+@media (max-width: 900px) {
+  .customer-page__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .customer-workspace { grid-template-columns: minmax(0, 1fr); }
+  .customer-directory__list { max-height: 300px; }
+}
+
+@media (max-width: 560px) {
+  .customer-page__heading { align-items: flex-start; flex-direction: column; }
+  .customer-page__heading > .MuiButton-root { width: 100%; }
+  .customer-page__stats { grid-template-columns: minmax(0, 1fr); }
+  .customer-profile__header { flex-wrap: wrap; }
+  .customer-profile__actions { width: 100%; justify-content: flex-end; }
+  .customer-profile__contact { grid-template-columns: minmax(0, 1fr); }
+  .customer-profile__stats { gap: 0.35rem; }
+  .customer-profile__stats > div { padding: 0.5rem 0.35rem; }
+  .customer-profile__stats strong { font-size: 0.72rem; }
+  .customer-dialog__two-col { grid-template-columns: minmax(0, 1fr); }
+}

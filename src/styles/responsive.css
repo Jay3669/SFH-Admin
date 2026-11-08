@@ -1,0 +1,399 @@
+/* Shared application layout and overflow safeguards */
+html {
+  overflow-x: hidden;
+}
+
+body,
+#root,
+.admin-shell,
+.admin-shell__main {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.admin-shell__main,
+.admin-shell__content,
+.admin-shell__content > * {
+  min-width: 0;
+}
+
+.MuiPaper-root,
+.MuiCard-root,
+.MuiTableContainer-root,
+.MuiDialog-paper {
+  min-width: 0;
+}
+
+.MuiTableContainer-root {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.MuiFormControl-root,
+.MuiTextField-root {
+  max-width: 100%;
+}
+
+/* Shared compact page headers */
+[class*="-page__hero"],
+.dashboard-hero,
+.notifications-hero,
+.financial-health__hero,
+.recipe-workflow__hero,
+.settings-balance-intro {
+  min-height: 100px !important;
+  padding: 16px 20px !important;
+  border-radius: 14px !important;
+}
+
+[class*="-page__hero"] h1,
+[class*="-page__hero"] h2,
+.dashboard-hero h1,
+.notifications-hero h1,
+.financial-health__hero h1,
+.recipe-workflow__hero h1,
+.settings-page__hero h1 {
+  font-size: 20px !important;
+}
+
+[class*="-page__hero"] p,
+[class*="-page__hero"] .MuiTypography-root,
+.dashboard-hero > div:first-child > p,
+.notifications-hero__copy p,
+.financial-health__hero-copy p {
+  font-size: 13px !important;
+}
+
+/* Shared control and icon alignment */
+.MuiButton-root,
+.MuiToggleButton-root,
+.MuiIconButton-root,
+.MuiTab-root {
+  align-items: center;
+}
+
+.MuiButton-root {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.MuiButton-root .MuiButton-startIcon,
+.MuiButton-root .MuiButton-endIcon {
+  margin: 0;
+}
+
+.MuiButton-root .MuiSvgIcon-root,
+.MuiIconButton-root .MuiSvgIcon-root,
+.MuiInputAdornment-root .MuiSvgIcon-root,
+.MuiListItemIcon-root .MuiSvgIcon-root,
+.MuiCard-root > .MuiSvgIcon-root,
+.MuiDialogTitle-root > .MuiSvgIcon-root {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  font-size: 18px;
+}
+
+.MuiTab-root,
+.MuiTab-root .MuiTab-iconWrapper {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.MuiTabs-root {
+  min-height: 46px;
+}
+
+.MuiTab-root {
+  min-height: 46px !important;
+  padding-block: 8px !important;
+}
+
+.MuiTab-root .MuiTab-iconWrapper {
+  margin-bottom: 0 !important;
+  margin-right: 7px;
+}
+
+.MuiTab-root .MuiSvgIcon-root {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+/* Global fallback styling for existing icon actions not yet migrated. */
+.MuiSwitch-root {
+  flex: 0 0 auto;
+  width: 48px !important;
+  height: 32px !important;
+  vertical-align: middle;
+}
+
+.MuiSwitch-root .MuiSwitch-switchBase {
+  padding: 8px;
+}
+
+.MuiSwitch-root .MuiSwitch-thumb {
+  width: 16px;
+  height: 16px;
+}
+
+.MuiSwitch-root .MuiSwitch-track {
+  border-radius: 8px;
+  opacity: 1;
+}
+
+.MuiSwitch-root .MuiSwitch-switchBase.Mui-checked {
+  transform: translateX(16px);
+  color: #ffffff !important;
+}
+
+.MuiSwitch-root .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
+  background: linear-gradient(135deg, #fde081, #fca930 55%, #f47b20) !important;
+  opacity: 1;
+}
+
+.MuiSwitch-root .MuiSwitch-track {
+  background-color: #b9beca;
+}
+
+.MuiSwitch-root .MuiSwitch-switchBase:not(.Mui-checked) {
+  color: #ffffff;
+}
+
+[data-admin-theme="dark"] .MuiSwitch-root .MuiSwitch-track {
+  background-color: #596174;
+}
+
+[data-admin-theme="dark"] .MuiSwitch-root .Mui-checked + .MuiSwitch-track {
+  background: linear-gradient(135deg, #fde081, #fca930 55%, #f47b20);
+}
+.MuiIconButton-root[aria-label^="View"],
+.MuiIconButton-root[aria-label*=" view"],
+.MuiIconButton-root[aria-label*="View"] {
+  color: #2878b8;
+}
+
+.MuiIconButton-root[aria-label^="Edit"],
+.MuiIconButton-root[aria-label*=" edit"],
+.MuiIconButton-root[aria-label*="Edit"] {
+  color: #73500a;
+}
+
+.MuiIconButton-root[aria-label^="Delete"],
+.MuiIconButton-root[aria-label^="Remove"],
+.MuiIconButton-root[aria-label*=" delete"],
+.MuiIconButton-root[aria-label*="Delete"],
+.MuiIconButton-root[aria-label*="Remove"] {
+  color: #c94242;
+}
+
+.MuiIconButton-root[aria-label^="View"]:hover,
+.MuiIconButton-root[aria-label*="View"]:hover {
+  background-color: rgba(40, 120, 184, .14);
+}
+
+.MuiIconButton-root[aria-label^="Edit"]:hover,
+.MuiIconButton-root[aria-label*="Edit"]:hover {
+  background-color: rgba(252, 169, 48, .18);
+}
+
+.MuiIconButton-root[aria-label^="Delete"]:hover,
+.MuiIconButton-root[aria-label^="Remove"]:hover,
+.MuiIconButton-root[aria-label*="Delete"]:hover,
+.MuiIconButton-root[aria-label*="Remove"]:hover {
+  background-color: rgba(201, 66, 66, .14);
+}
+
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label^="View"],
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label*="View"] { color: #82c5ff; }
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label^="Edit"],
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label*="Edit"] { color: #fde081; }
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label^="Delete"],
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label^="Remove"],
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label*="Delete"],
+[data-admin-theme="dark"] .MuiIconButton-root[aria-label*="Remove"] { color: #ff9b9b; }
+
+.MuiDialog-container {
+  padding: 16px;
+}
+
+.MuiDialog-paper {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+}
+
+.MuiDialogContent-root {
+  overflow-y: auto;
+}
+
+@media (max-width: 1100px) {
+  .admin-shell__content {
+    overflow-x: hidden;
+  }
+
+  .MuiDialog-container {
+    padding: 12px;
+  }
+
+  .MuiDialog-paper {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  [class*="__workspace"],
+  [class*="__layout"] {
+    min-width: 0;
+  }
+
+  .menu-management__toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .menu-category-filter {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .menu-management__search.MuiTextField-root {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .MuiDialog-paper {
+    margin: 16px !important;
+    width: calc(100% - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+  .MuiDialogContent-root { max-height: calc(100svh - 180px); overflow-y: auto; }
+  .MuiDialogActions-root { flex-wrap: wrap; gap: .35rem; }
+  .MuiSnackbar-root { left: 12px !important; right: 12px !important; width: auto !important; max-width: none !important; }
+
+  .admin-shell__content {
+    width: 100%;
+  }
+
+  .MuiDialogActions-root .MuiButton-root {
+    flex: 1 1 120px;
+  }
+
+  .MuiGrid-root {
+    min-width: 0;
+  }
+
+  .MuiTable-root {
+    min-width: max-content;
+  }
+
+  .menu-management__toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .menu-management__toolbar > * {
+    grid-column: 1 !important;
+    width: 100%;
+  }
+
+  [class*="__header"],
+  [class*="__toolbar"],
+  [class*="__filters"],
+  [class*="__actions"] {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 479px) {
+  [class*="-page__hero"],
+  .dashboard-hero,
+  .notifications-hero,
+  .financial-health__hero,
+  .recipe-workflow__hero,
+  .settings-balance-intro {
+    min-height: 80px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  [class*="-page__hero"] h1,
+  [class*="-page__hero"] h2,
+  .dashboard-hero h1,
+  .notifications-hero h1,
+  .financial-health__hero h1,
+  .recipe-workflow__hero h1,
+  .settings-page__hero h1 {
+    font-size: 17px !important;
+  }
+
+  [class*="-page__hero"] p,
+  .dashboard-hero > div:first-child > p,
+  .notifications-hero__copy p,
+  .financial-health__hero-copy p {
+    font-size: 12px !important;
+  }
+
+  .MuiButton-root {
+    min-height: 40px;
+  }
+
+  .MuiDialog-container {
+    padding: 8px;
+  }
+
+  .MuiDialog-paper {
+    margin: 8px !important;
+    width: calc(100% - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px);
+  }
+
+  .MuiDialogTitle-root,
+  .MuiDialogContent-root,
+  .MuiDialogActions-root {
+    padding-inline: 16px;
+  }
+
+  .admin-shell__content {
+    padding-inline: 12px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .app-content-width {
+    max-width: 1480px;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: 15px;
+  }
+
+  .MuiDialogTitle-root {
+    padding: 1.1rem 1.35rem 0.75rem;
+    font-size: 1.15rem;
+  }
+
+  .MuiDialogContent-root {
+    padding: 0.75rem 1.35rem;
+  }
+
+  .MuiDialogActions-root {
+    padding: 0.75rem 1.35rem 1.1rem;
+  }
+
+  .MuiDialogContent-root .MuiOutlinedInput-root,
+  .MuiDialogContent-root .MuiSelect-select {
+    min-height: 40px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .login-page {
+    min-height: 100svh;
+    align-items: flex-start;
+  }
+}

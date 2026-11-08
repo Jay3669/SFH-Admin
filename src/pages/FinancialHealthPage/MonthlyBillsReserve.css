@@ -1,0 +1,46 @@
+.monthly-reserve.MuiCard-root { display: grid; gap: 0.9rem; padding: 1.05rem 1.15rem; border: 1px solid #e6eaf0; border-radius: 0.8rem; background: #fff; }
+.monthly-reserve > .MuiAlert-root { border-radius: 0.6rem; font-size: 0.66rem; }
+.monthly-reserve__heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.monthly-reserve__heading > div { display: grid; gap: 0.16rem; }
+.monthly-reserve__heading > .MuiSvgIcon-root { color: #43835d; font-size: 1.75rem; }
+.monthly-reserve__eyebrow.MuiTypography-root { color: #b17a2e; font-size: 0.59rem; font-weight: 850; letter-spacing: 0.12em; }
+.monthly-reserve__heading h2.MuiTypography-root { color: #344156; font-size: 0.9rem; font-weight: 850; }
+.monthly-reserve__heading p.MuiTypography-root { color: #8992a0; font-size: 0.65rem; }
+.monthly-reserve__plan-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem; border: 1px solid #edf0f3; border-radius: 0.6rem; background: #fafbfc; }
+.monthly-reserve__plan-toolbar .MuiTextField-root { width: min(230px, 100%); }
+.monthly-reserve__bills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.monthly-reserve__bill { display: grid; align-content: start; gap: 0.75rem; min-width: 0; padding: 0.85rem; border: 1px solid #e9edf1; border-radius: 0.65rem; }
+.monthly-reserve__bill-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.monthly-reserve__bill-heading h3.MuiTypography-root { color: #3e4b61; font-size: 0.76rem; font-weight: 800; }
+.monthly-reserve__bill-heading p.MuiTypography-root { margin-top: 0.12rem; color: #8992a0; font-size: 0.61rem; }
+.monthly-reserve__bill-heading > strong { color: #286c47; font-size: 0.82rem; text-align: right; white-space: nowrap; }
+.monthly-reserve__bill-heading > strong span { color: #8a94a2; font-size: 0.59rem; font-weight: 500; }
+.monthly-reserve__fields { display: grid; grid-template-columns: minmax(0, 1fr) 100px; gap: 0.6rem; }
+.monthly-reserve__bill .MuiInputBase-root { font-size: 0.72rem; }
+.monthly-reserve__bill .MuiInputLabel-root { font-size: 0.7rem; }
+.monthly-reserve__daily { display: grid; grid-template-columns: minmax(0, 1fr) 130px; align-items: center; gap: 0.55rem; padding-top: 0.65rem; border-top: 1px solid #edf0f3; }
+.monthly-reserve__daily > div:first-child { display: grid; gap: 0.12rem; }
+.monthly-reserve__daily > div:first-child span { color: #8992a0; font-size: 0.59rem; }
+.monthly-reserve__daily > div:first-child strong { color: #40516a; font-size: 0.77rem; }
+.monthly-reserve__daily .MuiButton-root { grid-column: 1 / -1; min-height: 34px; font-size: 0.65rem; }
+.monthly-reserve__payment { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.monthly-reserve__payment p.MuiTypography-root { color: #69758a; font-size: 0.62rem; }
+.monthly-reserve__payment .MuiButton-root { font-size: 0.63rem; }
+.monthly-reserve__history { display: grid; gap: 0.32rem; padding-top: 0.55rem; border-top: 1px solid #edf0f3; }
+.monthly-reserve__history > div { display: flex; justify-content: space-between; gap: 0.5rem; color: #7d8796; font-size: 0.59rem; }
+.monthly-reserve__history strong { color: #4b5870; white-space: nowrap; }
+.monthly-reserve__empty.MuiTypography-root { color: #8992a0; font-size: 0.64rem; }
+.monthly-reserve__payment-form { display: grid; gap: 0.85rem; padding-top: 0.65rem !important; }
+.monthly-reserve__payment-form p.MuiTypography-root { color: #69758a; font-size: 0.7rem; }
+.monthly-reserve__payment-form .MuiAlert-root { font-size: 0.65rem; }
+
+@media (max-width: 760px) {
+  .monthly-reserve__bills { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .monthly-reserve__plan-toolbar { align-items: stretch; flex-direction: column; }
+  .monthly-reserve__plan-toolbar .MuiTextField-root { width: 100%; }
+  .monthly-reserve__daily { grid-template-columns: minmax(0, 1fr); }
+  .monthly-reserve__daily .MuiButton-root { grid-column: auto; }
+}

@@ -1,0 +1,437 @@
+.admin-shell {
+    display: flex;
+    min-height: 100svh;
+    background: #f5f6fa;
+}
+
+.admin-sidebar {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    width: 100%;
+    min-height: 100svh;
+    flex-direction: column;
+    padding: 1.25rem 0.9rem 1rem;
+    overflow: hidden auto;
+    background:
+        radial-gradient(ellipse at 0% 6%, rgb(255 196 61 / 9%), transparent 38%),
+        linear-gradient(160deg, #20283a 0%, #171e2e 54%, #141a29 100%);
+    color: #fff;
+    animation: sidebar-enter 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.admin-sidebar::after {
+    position: absolute;
+    z-index: -1;
+    right: -5.5rem;
+    bottom: 4.5rem;
+    width: 11rem;
+    height: 11rem;
+    border: 1px solid rgb(255 212 90 / 5%);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 1.4rem rgb(255 212 90 / 2%),
+        0 0 0 2.8rem rgb(255 212 90 / 1%);
+    content: "";
+    pointer-events: none;
+}
+
+.admin-sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.1rem 0.55rem 2rem;
+    animation: nav-item-enter 420ms 60ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.admin-sidebar__brand img {
+    width: 4.5rem;
+    height: 4.5rem;
+    flex: 0 0 auto;
+    border: 2px solid rgb(255 212 90 / 38%);
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 4px rgb(255 212 90 / 6%);
+    transition: transform 260ms ease, box-shadow 260ms ease;
+}
+
+.admin-sidebar__brand:hover img {
+    transform: rotate(-5deg) scale(1.04);
+    box-shadow: 0 0 0 6px rgb(255 212 90 / 10%);
+}
+
+.admin-sidebar__brand-name.MuiTypography-root {
+    color: #fff;
+    font-family: "Manrope", sans-serif;
+    font-size: 0.93rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.admin-sidebar__brand-caption.MuiTypography-root {
+    margin-top: 0.2rem;
+    color: #f5c955;
+    font-size: 0.61rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.admin-sidebar__section-label.MuiTypography-root {
+    padding: 0.3rem 0.7rem 0.65rem;
+    color: #8993a7;
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+}
+
+.admin-sidebar__nav-item.MuiListItemButton-root {
+    position: relative;
+    min-height: 36px;
+    margin-bottom: 0.3rem;
+    padding-inline: 0.65rem;
+    border-radius: 0.7rem;
+    color: #b2bac9;
+    animation: nav-item-enter 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+    transition:
+        transform 180ms ease,
+        background-color 160ms ease,
+        color 160ms ease;
+}
+
+.admin-sidebar__nav-item:nth-of-type(1) {
+    animation-delay: 100ms;
+}
+
+.admin-sidebar__nav-item:nth-of-type(2) {
+    animation-delay: 150ms;
+}
+
+.admin-sidebar__nav-item.MuiListItemButton-root:hover {
+    transform: translateX(2px);
+    background: rgb(255 255 255 / 7%);
+    color: #fff;
+}
+
+.admin-sidebar__nav-item.MuiListItemButton-root:active {
+    transform: translateX(1px) scale(0.99);
+}
+
+.admin-sidebar__nav-item .MuiListItemIcon-root {
+    min-width: 26px;
+    color: #929db0;
+    transition: color 180ms ease, transform 220ms ease;
+}
+
+.admin-sidebar__nav-item:hover .MuiListItemIcon-root {
+    transform: scale(1.08);
+    color: #f5c955;
+}
+
+.admin-sidebar__nav-item .MuiListItemText-primary {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.admin-sidebar__nav-item.is-active.MuiListItemButton-root {
+    background: rgb(255 212 90 / 12%);
+    color: #fff;
+    box-shadow: inset 3px 0 #f5c955;
+}
+
+.admin-sidebar__nav-item.is-active .MuiListItemText-primary {
+    font-weight: 700;
+}
+
+.admin-sidebar__nav-item.is-active .MuiListItemIcon-root {
+    color: #f5c955;
+}
+
+.admin-sidebar__nav-item.Mui-focusVisible {
+    outline: 2px solid #f5c955;
+    outline-offset: -2px;
+}
+
+.admin-sidebar__bottom {
+    margin-top: auto;
+}
+
+.admin-sidebar__bottom .MuiDivider-root {
+    margin-bottom: 1rem;
+    border-color: rgb(255 255 255 / 12%);
+}
+
+.admin-sidebar__profile {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 0.15rem;
+}
+
+.admin-sidebar__avatar.MuiAvatar-root,
+.admin-header__avatar.MuiAvatar-root {
+    width: 2.25rem;
+    height: 2.25rem;
+    background: #f5c955;
+    color: #20283a;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.admin-sidebar__profile-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-sidebar__user-name.MuiTypography-root {
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.admin-sidebar__user-role.MuiTypography-root {
+    margin-top: 0.1rem;
+    color: #aeb7c7;
+    font-size: 0.68rem;
+}
+
+.admin-sidebar__logout.MuiIconButton-root {
+    color: #b5bdcc;
+    transition: transform 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+
+.admin-sidebar__logout.MuiIconButton-root:hover {
+    transform: rotate(-6deg);
+    color: #f5c955;
+    background: rgb(255 255 255 / 8%);
+}
+
+.admin-shell__main {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.admin-header.MuiAppBar-root {
+    border-bottom: 1px solid #e8ebf1;
+    background: rgb(255 255 255 / 96%);
+    color: #1d2637;
+    backdrop-filter: blur(12px);
+}
+
+.admin-header__toolbar.MuiToolbar-root {
+    min-height: 72px;
+    padding-inline: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.admin-header__menu.MuiIconButton-root {
+    margin-right: 0.55rem;
+    color: #384254;
+}
+
+.admin-header__title {
+    min-width: 0;
+}
+
+.admin-header__title .MuiTypography-h6 {
+    font-family: "Manrope", sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+}
+
+.admin-header__title .MuiTypography-caption {
+    display: block;
+    margin-top: 0.1rem;
+    color: #778092;
+    font-size: 0.72rem;
+}
+
+.admin-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.admin-header__notifications.MuiIconButton-root,
+.admin-header__theme-toggle.MuiIconButton-root {
+    flex: 0 0 auto;
+}
+
+.admin-header__account {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-left: 0.25rem;
+}
+
+.admin-header__account-details {
+    max-width: 13rem;
+}
+
+.admin-header__account-details .MuiTypography-root:first-child {
+    color: #283246;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.admin-header__account-details .MuiTypography-caption {
+    color: #818a9b;
+    text-transform: capitalize;
+}
+
+.admin-shell__content {
+    width: 100%;
+    min-height: 0;
+    flex: 1;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+@media (max-width: 767px) {
+    .admin-header__toolbar.MuiToolbar-root {
+        min-height: 64px;
+    }
+
+    .admin-header__account-details {
+        display: none;
+    }
+
+    .admin-header__account {
+        margin-left: 0;
+    }
+
+    .admin-shell__content {
+        padding: 1.1rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .admin-header__toolbar.MuiToolbar-root {
+        min-height: 62px;
+        padding-inline: 1.5rem;
+    }
+
+    .admin-shell__content {
+        padding: 1.25rem;
+    }
+
+    .admin-shell .MuiButton-root {
+        min-height: 40px;
+        padding: 0.45rem 0.85rem;
+        border-radius: 0.65rem;
+        font-size: 0.86rem;
+        line-height: 1.2;
+    }
+
+    .admin-shell .MuiButton-startIcon {
+        margin-right: 0.4rem;
+        margin-left: -0.15rem;
+    }
+
+    .admin-shell .MuiButton-startIcon .MuiSvgIcon-root,
+    .admin-shell .MuiButton-endIcon .MuiSvgIcon-root {
+        font-size: 1.15rem;
+    }
+
+    .admin-shell .MuiIconButton-root {
+        width: 40px;
+        height: 40px;
+        padding: 0.4rem;
+    }
+
+    .admin-shell .MuiIconButton-root .MuiSvgIcon-root {
+        font-size: 2rem;
+    }
+
+    .admin-shell .MuiOutlinedInput-root,
+    .admin-shell .MuiSelect-select {
+        min-height: 40px;
+        font-size: 0.88rem;
+    }
+
+    .admin-shell .MuiInputLabel-root {
+        font-size: 0.88rem;
+    }
+
+    .admin-shell .MuiChip-root {
+        height: 24px;
+        font-size: 0.72rem;
+    }
+
+    .admin-shell .MuiAvatar-root {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+
+    .admin-shell .MuiDialogTitle-root {
+        padding: 1.1rem 1.35rem 0.75rem;
+        font-size: 1.15rem;
+    }
+
+    .admin-shell .MuiDialogContent-root {
+        padding: 0.75rem 1.35rem;
+    }
+
+    .admin-shell .MuiDialogActions-root {
+        padding: 0.75rem 1.35rem 1.1rem;
+    }
+
+    .admin-header__avatar.MuiAvatar-root {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-sidebar,
+    .admin-sidebar__brand,
+    .admin-sidebar__nav-item.MuiListItemButton-root {
+        animation: none;
+    }
+
+    .admin-sidebar__brand img,
+    .admin-sidebar__nav-item.MuiListItemButton-root,
+    .admin-sidebar__nav-item .MuiListItemIcon-root,
+    .admin-sidebar__logout.MuiIconButton-root {
+        transition: none;
+    }
+
+    .admin-sidebar__nav-item:hover,
+    .admin-sidebar__nav-item:hover .MuiListItemIcon-root,
+    .admin-sidebar__logout.MuiIconButton-root:hover {
+        transform: none;
+    }
+}
+
+@keyframes sidebar-enter {
+    from {
+        opacity: 0.75;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes nav-item-enter {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+.css-1umw9bq-MuiSvgIcon-root {
+    width: .8em !important;
+    height: .8em !important;
+}

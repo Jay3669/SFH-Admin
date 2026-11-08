@@ -1,0 +1,50 @@
+.billing-report { display: grid; gap: 1.1rem; padding-block: 0.4rem 2rem; }
+.billing-report__intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; }
+.billing-report__intro > div:first-child { display: grid; justify-items: start; gap: 0.35rem; }
+.billing-report__intro h1.MuiTypography-root { color: #233629; font-size: clamp(1.35rem, 3vw, 1.8rem); font-weight: 850; }
+.billing-report__intro p.MuiTypography-root { color: #718078; font-size: 0.83rem; }
+.billing-report__intro .MuiChip-root { color: #326246; background: #e8f3eb; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; }
+.billing-report__intro .MuiToggleButtonGroup-root { border: 1px solid #dfe8df; border-radius: 0.7rem; background: #fff; }
+.billing-report__intro .MuiToggleButton-root { padding-inline: 1rem; color: #627068; font-weight: 700; text-transform: none; }
+.billing-report__intro .MuiToggleButton-root.Mui-selected { color: #fff; background: #285d43; }
+.billing-report__range { color: #758179; font-size: 0.78rem; }
+.billing-report__totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
+.billing-report__totals .MuiCard-root, .billing-report__list.MuiCard-root { border: 1px solid #e6ebe7; border-radius: 0.85rem; background: #fff; }
+.billing-report__totals .MuiCardContent-root { display: grid; gap: 0.3rem; padding: 1rem; }
+.billing-report__totals p.MuiTypography-root { color: #233629; font-size: 1.35rem; font-weight: 850; }
+.billing-report__totals .MuiCardContent-root > p:first-child { color: #78837b; font-size: 0.75rem; font-weight: 700; }
+.billing-report__totals .MuiCardContent-root > p:last-child { color: #869088; font-size: 0.7rem; }
+.billing-report__grand.MuiCard-root { border-color: #c9dfce; background: linear-gradient(135deg, #f4faf5, #eaf5ec); }
+.billing-report__list .MuiCardContent-root { padding: 0.9rem; }
+.billing-report__tab-action { display: flex; justify-content: flex-end; padding: 0.65rem 1rem 0; }
+.billing-report__tab-action .MuiButton-root { text-transform: none; }
+.billing-report__list-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; }
+.billing-report__list-heading h2.MuiTypography-root { color: #2e4135; font-size: 0.95rem; font-weight: 800; }
+.billing-report__list-heading .MuiChip-root { color: #68776d; background: #f0f3f0; font-size: 0.67rem; }
+.billing-report__table-wrap { overflow-x: auto; }
+.billing-report__table-wrap .MuiTableCell-root { padding: 0.65rem 0.45rem; border-color: #edf0ed; font-size: 0.73rem; }
+.billing-report__table-wrap .MuiTableHead-root .MuiTableCell-root { color: #829087; font-size: 0.63rem; font-weight: 800; text-transform: uppercase; }
+.billing-report__bill-number { color: #31483a; font-size: 0.74rem; font-weight: 800; }
+.billing-report__muted.MuiTypography-root { margin-top: 0.12rem; color: #89938c; font-size: 0.65rem; }
+.billing-report__filters { padding: 0.8rem 1rem; border-bottom: 1px solid #edf0ed; overflow-x: auto; }
+.billing-report__filters .MuiToggleButtonGroup-root { border-radius: 0.65rem; }
+.billing-report__filters .MuiToggleButton-root { padding: 0.4rem 0.75rem; color: #68766d; font-size: 0.72rem; text-transform: none; white-space: nowrap; }
+.billing-report__filters .MuiToggleButton-root.Mui-selected { color: #fff; background: #285d43; }
+.billing-report__clickable-row { cursor: pointer; }
+.billing-report__row-link.MuiButton-root { min-width: 0; padding: 0; color: #285d43; font-size: 0.74rem; font-weight: 800; text-transform: none; }
+.billing-report__dialog-content { display: grid; gap: 0.8rem; padding-top: 0.7rem !important; }
+.billing-report__dialog-content > .MuiTextField-root { margin-top: 0.25rem; }
+.billing-report__detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem 1rem; }
+.billing-report__detail-heading.MuiTypography-root { margin-top: 0.45rem; color: #34493a; font-size: 0.78rem; font-weight: 800; }
+.billing-report__detail-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.3rem 0; border-bottom: 1px solid #eff2ef; }
+.billing-report__detail-row p:first-child { color: #7a867e; font-size: 0.7rem; }
+.billing-report__detail-row p:last-child { color: #34453a; font-size: 0.72rem; font-weight: 650; text-align: right; }
+.billing-report__detail-totals { display: grid; gap: 0.1rem; padding-top: 0.25rem; }
+.billing-report__dialog-actions { flex-wrap: wrap; }
+.billing-report__empty { padding: 1.5rem 0.5rem; color: #859087; font-size: 0.78rem; text-align: center; }
+.billing-report__loading { display: flex; min-height: 12rem; align-items: center; justify-content: center; gap: 0.7rem; color: #758179; }
+@media (max-width: 760px) {
+  .billing-report__intro { align-items: flex-start; flex-direction: column; }
+  .billing-report__totals { grid-template-columns: 1fr; }
+  .billing-report__detail-grid { grid-template-columns: 1fr; }
+}
