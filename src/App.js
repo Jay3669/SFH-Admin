@@ -26,6 +26,7 @@ import PromotionsPage from "./pages/PromotionsPage/PromotionsPage";
 import AggregatorOrdersPage from "./pages/AggregatorOrdersPage/AggregatorOrdersPage";
 import KitchenAnalyticsPage from "./pages/KitchenAnalyticsPage/KitchenAnalyticsPage";
 import { getStoredAdmin, logoutAdmin } from "./services/authService";
+import { notifyApiError } from "./utils/apiErrorStore";
 import { createAppTheme } from "./styles/theme";
 import "./styles/global.css";
 import "./styles/responsive.css";
@@ -179,7 +180,7 @@ function App() {
   }
 
   function handleLogout() {
-    logoutAdmin();
+    logoutAdmin().catch((error) => notifyApiError(error.message || "Unable to end the session on the server."));
     setUser(null);
     window.history.pushState({}, "", LOGIN_PATH);
   }

@@ -16,6 +16,7 @@ const REQUEST_TIMEOUT_MS = 30000;
 function isAuthenticationRequest(path) {
   const pathname = new URL(path, API_BASE_URL).pathname;
   return pathname === API_ENDPOINTS.userLogin ||
+    pathname === API_ENDPOINTS.userLogout ||
     pathname === API_ENDPOINTS.forgotPassword;
 }
 
@@ -44,13 +45,11 @@ export async function apiRequest(path, options = {}) {
 
   let sessionExpiredResponse = false;
   try {
-    const token = window.localStorage.getItem("authToken");
     const response = await fetch(new URL(path, API_BASE_URL), {
       credentials: "include",
       ...requestOptions,
       signal: controller.signal,
       headers: {
-        ...(token ? { Authorization: "Bearer " + token } : {}),
         ...(requestOptions.body ? { "Content-Type": "application/json" } : {}),
         ...requestOptions.headers,
       },

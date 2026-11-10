@@ -3,6 +3,7 @@ import BillingReportPage from "./BillingReportPage";
 import { getBillingReport } from "../../services/billingReport";
 import { closeCashDrawer, getCashDrawerSessions } from "../../services/cashDrawer";
 import { recordPurchasePayment, receivePurchase } from "../../services/inventoryService";
+import { voidPosSale } from "../../services/posService";
 
 jest.mock("../../services/billingReport", () => ({
   getBillingReport: jest.fn(),
@@ -16,6 +17,10 @@ jest.mock("../../services/inventoryService", () => ({
 jest.mock("../../services/cashDrawer", () => ({
   closeCashDrawer: jest.fn(),
   getCashDrawerSessions: jest.fn(),
+}));
+
+jest.mock("../../services/posService", () => ({
+  voidPosSale: jest.fn(),
 }));
 
 function createReport(period) {
@@ -65,6 +70,31 @@ function createReport(period) {
         balanceDue: 0,
         tenders: [{ method: "Cash", amount: 400 }],
         total: 400,
+      }, {
+        id: "sale-2",
+        billNumber: "POS-11",
+        items: [{ name: "Paneer Bowl", quantity: 1, total: 200 }],
+        date: "2026-11-07T06:35:00.000Z",
+        paymentMethod: "Cash",
+        status: "Voided",
+        orderType: "Dine-in",
+        subtotal: 200,
+        discount: 0,
+        packaging: 0,
+        tax: 0,
+        amountPaid: 200,
+        changeDue: 0,
+        balanceDue: 0,
+        tenders: [{ method: "Cash", amount: 200 }],
+        total: 200,
+        voidAudit: {
+          reason: "Duplicate entry",
+          previousStatus: "Paid",
+          amount: 200,
+          requestedBy: "3",
+          approvedBy: "1",
+          voidedAt: "2026-11-07T07:00:00.000Z",
+        },
       }],
     },
     grandTotal: 650,
@@ -82,6 +112,7 @@ beforeEach(() => {
     expectedCash: 450,
   }]);
   closeCashDrawer.mockResolvedValue({ success: true });
+  voidPosSale.mockResolvedValue({ success: true, sale: { id: "sale-1", status: "Voided" } });
 });
 
 test("shows purchase, sales, and grand totals and their bills", async () => {
@@ -110,6 +141,41 @@ test("loads the selected reporting period", async () => {
   expect(screen.getByRole("group", { name: /report period/i })).toContainElement(
     screen.getByRole("button", { name: "Weekly" })
   );
+});
+
+test("shows void audit details in the sales report", async () => {
+  render(<BillingReportPage />);
+  await screen.findByText("PO-123");
+  fireEvent.click(screen.getByRole("tab", { name: /sales/i }));
+  fireEvent.click(screen.getByRole("button", { name: /voided/i }));
+  fireEvent.click(await screen.findByRole("button", { name: "POS-11" }));
+
+  const dialog = await screen.findByRole("dialog", { name: /sales bill details/i });
+  expect(within(dialog).getByText("Duplicate entry")).toBeInTheDocument();
+  expect(within(dialog).getByText("Approved by")).toBeInTheDocument();
+  expect(within(dialog).queryByRole("button", { name: /void bill/i })).not.toBeInTheDocument();
+});
+
+test("voids a bill only after a reason and supervisor PIN are supplied", async () => {
+  render(<BillingReportPage />);
+  await screen.findByText("PO-123");
+  fireEvent.click(screen.getByRole("tab", { name: /sales/i }));
+  fireEvent.click(screen.getByRole("button", { name: "POS-10" }));
+  fireEvent.click(await screen.findByRole("button", { name: /void bill/i }));
+
+  fireEvent.change(screen.getByRole("textbox", { name: /reason for void/i }), {
+    target: { value: "Duplicate entry" },
+  });
+  fireEvent.change(screen.getByLabelText(/supervisor pin/i), {
+    target: { value: "1234" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: /confirm void/i }));
+
+  await waitFor(() => expect(voidPosSale).toHaveBeenCalledWith("sale-1", {
+    reason: "Duplicate entry",
+    pin: "1234",
+  }));
+  expect(await screen.findByText(/POS-10 was voided and recorded/i)).toBeInTheDocument();
 });
 
 test("filters purchases by payment status and opens the complete purchase details", async () => {

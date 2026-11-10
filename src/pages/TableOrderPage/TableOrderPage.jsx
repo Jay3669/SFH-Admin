@@ -48,6 +48,33 @@ function itemId(item) {
   return String(item.menu_item_id ?? item.id);
 }
 
+function getTableId(tables, name) {
+  const normalizedName = name.trim().toLowerCase();
+  const table = tables.find((entry) => entry.tableName.trim().toLowerCase() === normalizedName);
+  return table ? String(table.id) : null;
+}
+
+function saveTableDraft(tableId, cart) {
+  if (!tableId) return;
+  const key = `sfh:table-order-draft:${tableId}`;
+  if (cart.length) window.localStorage.setItem(key, JSON.stringify(cart));
+  else window.localStorage.removeItem(key);
+}
+
+function readTableDraft(tableId) {
+  const serializedDraft = window.localStorage.getItem(`sfh:table-order-draft:${tableId}`);
+  if (!serializedDraft) return null;
+  const draft = JSON.parse(serializedDraft);
+  if (!Array.isArray(draft) || draft.some((item) => (
+    !item || typeof item.id !== "string" || typeof item.name !== "string"
+    || !Number.isFinite(Number(item.price)) || !Number.isSafeInteger(item.quantity)
+    || item.quantity < 1 || item.quantity > 99
+  ))) {
+    throw new Error("The saved table order draft is invalid.");
+  }
+  return draft;
+}
+
 function makeIdempotencyKey() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -79,6 +106,17 @@ export default function TableOrderPage() {
   const [contextTableName, setContextTableName] = useState("");
   const [clock, setClock] = useState(Date.now());
   const [printRequested, setPrintRequested] = useState(false);
+  const firingRef = useRef(false);
+  const draftSaveTimer = useRef(null);
+  const cartRef = useRef(cart);
+  const tableNameRef = useRef(tableName);
+  const tablesRef = useRef(tables);
+  const lastDraftTableId = useRef(null);
+  const needsDraftRestore = useRef(true);
+  const draftTableId = getTableId(tables, tableName);
+  cartRef.current = cart;
+  tableNameRef.current = tableName;
+  tablesRef.current = tables;
 
   useEffect(() => {
     let active = true;
@@ -164,6 +202,21 @@ export default function TableOrderPage() {
         const category = updatedItem.category_name || updatedItem.category?.category_name;
         if (category) setCategories((current) => current.includes(category) ? current : [...current, category]);
       });
+      const updateTableStatus = (event) => {
+        const incomingTable = event?.table || event;
+        const incomingName = incomingTable?.tableName || incomingTable?.table_name;
+        const incomingId = incomingTable?.id ?? incomingTable?.table_id;
+        const incomingStatus = incomingTable?.status;
+        if (!incomingStatus) return;
+        setTables((current) => current.map((table) => (
+          (incomingId != null && String(table.id) === String(incomingId))
+          || (incomingName && table.tableName === incomingName)
+            ? { ...table, status: incomingStatus }
+            : table
+        )));
+      };
+      socket.on("table:settled", updateTableStatus);
+      socket.on("table:status", updateTableStatus);
       socket.on("connect_error", (socketError) => {
         if (active) setError(`Live menu updates are unavailable: ${socketError.message || "Connection error."}`);
       });
@@ -173,6 +226,51 @@ export default function TableOrderPage() {
     return () => {
       active = false;
       socket?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!draftTableId) {
+      needsDraftRestore.current = true;
+      return;
+    }
+    if (!needsDraftRestore.current && lastDraftTableId.current === draftTableId) return;
+    try {
+      const draft = readTableDraft(draftTableId);
+      if (draft) setCart(draft);
+      else if (lastDraftTableId.current) setCart([]);
+      lastDraftTableId.current = draftTableId;
+      needsDraftRestore.current = false;
+    } catch (draftError) {
+      setError(`Unable to restore the saved table order: ${draftError.message}`);
+    }
+  }, [draftTableId]);
+
+  useEffect(() => {
+    if (!draftTableId) return undefined;
+    window.clearTimeout(draftSaveTimer.current);
+    draftSaveTimer.current = window.setTimeout(() => {
+      try {
+        saveTableDraft(draftTableId, cart);
+      } catch (draftError) {
+        setError(`Unable to save the table order draft: ${draftError.message}`);
+      }
+    }, 1500);
+    return () => window.clearTimeout(draftSaveTimer.current);
+  }, [cart, draftTableId]);
+
+  useEffect(() => {
+    const flushDraft = () => {
+      try {
+        saveTableDraft(getTableId(tablesRef.current, tableNameRef.current), cartRef.current);
+      } catch (draftError) {
+        setError(`Unable to save the table order draft: ${draftError.message}`);
+      }
+    };
+    window.addEventListener("pagehide", flushDraft);
+    return () => {
+      window.removeEventListener("pagehide", flushDraft);
+      flushDraft();
     };
   }, []);
 
@@ -303,7 +401,7 @@ export default function TableOrderPage() {
     setCart((current) => {
       const existing = current.find((row) => row.id === item.id);
       return existing
-        ? current.map((row) => row.id === item.id ? { ...row, quantity: row.quantity + 1 } : row)
+        ? current.map((row) => row.id === item.id ? { ...row, quantity: Math.min(99, row.quantity + 1) } : row)
         : [...current, { ...item, quantity: 1 }];
     });
   }
@@ -311,11 +409,12 @@ export default function TableOrderPage() {
   function changeQuantity(id, amount) {
     fireKey.current = null;
     setCart((current) => current
-      .map((item) => item.id === id ? { ...item, quantity: item.quantity + amount } : item)
+      .map((item) => item.id === id ? { ...item, quantity: Math.min(99, item.quantity + amount) } : item)
       .filter((item) => item.quantity > 0));
   }
 
   async function handleFireKot() {
+    if (firingRef.current) return;
     if (!tableName.trim()) {
       setError("Enter a table name or number before firing the KOT.");
       return;
@@ -324,6 +423,7 @@ export default function TableOrderPage() {
       setError("Add at least one menu item before firing the KOT.");
       return;
     }
+    firingRef.current = true;
     setSaving(true);
     setError("");
     setFiredKots([]);
@@ -337,17 +437,24 @@ export default function TableOrderPage() {
       });
     } catch (fireError) {
       setError(fireError.message || "Unable to send the order to the kitchen.");
+      firingRef.current = false;
       setSaving(false);
       return;
     }
     setFiredKots(kots);
     setCart([]);
+    try {
+      saveTableDraft(getTableId(tables, tableName), []);
+    } catch (draftError) {
+      setError(`KOTs were sent, but the saved draft could not be cleared: ${draftError.message}`);
+    }
     fireKey.current = null;
     try {
       await refreshTables();
     } catch (refreshError) {
       setError(`KOTs were sent, but the live table list could not refresh: ${refreshError.message}`);
     } finally {
+      firingRef.current = false;
       setSaving(false);
     }
   }
@@ -676,6 +783,13 @@ export default function TableOrderPage() {
             label="Table name or number"
             value={tableName}
             onChange={(event) => {
+              if (draftTableId) {
+                try {
+                  saveTableDraft(draftTableId, cartRef.current);
+                } catch (draftError) {
+                  setError(`Unable to save the table order draft: ${draftError.message}`);
+                }
+              }
               fireKey.current = null;
               setTableName(event.target.value);
             }}
@@ -695,7 +809,7 @@ export default function TableOrderPage() {
                   <ButtonGroup size="small" aria-label={`${item.name} quantity`}>
                     <IconButton aria-label={`Decrease ${item.name}`} onClick={() => changeQuantity(item.id, -1)}><RemoveRoundedIcon fontSize="small" /></IconButton>
                     <Button disabled>{item.quantity}</Button>
-                    <IconButton aria-label={`Increase ${item.name}`} onClick={() => changeQuantity(item.id, 1)}><AddRoundedIcon fontSize="small" /></IconButton>
+                    <IconButton aria-label={`Increase ${item.name}`} disabled={item.quantity >= 99} onClick={() => changeQuantity(item.id, 1)}><AddRoundedIcon fontSize="small" /></IconButton>
                   </ButtonGroup>
                   <IconButton aria-label={`Remove ${item.name}`} onClick={() => changeQuantity(item.id, -item.quantity)}><DeleteOutlineRoundedIcon fontSize="small" /></IconButton>
                 </Box>

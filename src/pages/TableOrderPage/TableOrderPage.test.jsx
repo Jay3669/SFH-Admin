@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import TableOrderPage from "./TableOrderPage";
 import { listMenuCategories, listMenuItems } from "../../services/menuService";
 import {
@@ -8,6 +8,8 @@ import {
   transferDiningTable,
   updateDiningTableStatus,
 } from "../../services/kotService";
+
+let mockSocketHandlers;
 
 jest.mock("../../services/menuService", () => ({
   listMenuCategories: jest.fn(),
@@ -20,11 +22,17 @@ jest.mock("../../services/kotService", () => ({
   listDiningTables: jest.fn(),
   transferDiningTable: jest.fn(),
   updateDiningTableStatus: jest.fn(),
-  connectKitchenSocket: () => ({ on: jest.fn(), disconnect: jest.fn() }),
+  connectKitchenSocket: () => ({
+    on: jest.fn((event, handler) => { mockSocketHandlers[event] = handler; }),
+    disconnect: jest.fn(),
+  }),
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.useRealTimers();
+  window.localStorage.clear();
+  mockSocketHandlers = {};
   listMenuCategories.mockResolvedValue([{ category_id: 1, category_name: "Mains" }]);
   listMenuItems.mockResolvedValue([
     { menu_item_id: 12, name: "Tandoori Chicken", price: "320.00", category_id: 1, kitchen_station: "Tandoor" },
@@ -51,6 +59,82 @@ test("fires a table order and confirms its station KOT", async () => {
     idempotencyKey: expect.any(String),
   })));
   expect(await screen.findByText(/KOT-000001 · Tandoor/)).toBeInTheDocument();
+});
+
+test("restores a saved draft for the selected table", async () => {
+  listDiningTables.mockResolvedValue([{
+    id: "table-4",
+    tableName: "Table 4",
+    status: "vacant",
+    kots: [],
+  }]);
+  window.localStorage.setItem("sfh:table-order-draft:table-4", JSON.stringify([
+    { id: "12", name: "Tandoori Chicken", price: 320, category: "Mains", quantity: 3 },
+  ]));
+  render(<TableOrderPage />);
+
+  fireEvent.change(await screen.findByRole("textbox", { name: "Table name or number" }), {
+    target: { value: "Table 4" },
+  });
+
+  expect(await screen.findByText("3 items in order")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "3" })).toBeInTheDocument();
+});
+
+test("saves table-order changes after the debounce interval", async () => {
+  listDiningTables.mockResolvedValue([{
+    id: "table-4",
+    tableName: "Table 4",
+    status: "vacant",
+    kots: [],
+  }]);
+  render(<TableOrderPage />);
+  const tableInput = await screen.findByRole("textbox", { name: "Table name or number" });
+  await screen.findByRole("button", { name: "Add Tandoori Chicken to table order" });
+  jest.useFakeTimers();
+
+  fireEvent.change(tableInput, { target: { value: "Table 4" } });
+  fireEvent.click(screen.getByRole("button", { name: "Add Tandoori Chicken to table order" }));
+  act(() => jest.advanceTimersByTime(1500));
+
+  expect(JSON.parse(window.localStorage.getItem("sfh:table-order-draft:table-4"))).toEqual([
+    expect.objectContaining({ id: "12", name: "Tandoori Chicken", quantity: 1 }),
+  ]);
+  jest.useRealTimers();
+});
+
+test("caps table-order item quantities at 99", async () => {
+  render(<TableOrderPage />);
+  const addButton = await screen.findByRole("button", { name: "Add Tandoori Chicken to table order" });
+  for (let index = 0; index < 100; index += 1) fireEvent.click(addButton);
+
+  expect(screen.getByText("99 items in order")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Increase Tandoori Chicken" })).toBeDisabled();
+});
+
+test("applies live table status events without replacing active KOTs", async () => {
+  listDiningTables.mockResolvedValue([{
+    id: "table-4",
+    tableName: "Table 4",
+    status: "occupied",
+    kots: [{
+      id: "kot-1",
+      number: "KOT-000001",
+      station: "Tandoor",
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      items: [{ id: "item-1", menuItemId: "12", name: "Tandoori Chicken", quantity: 1 }],
+    }],
+  }]);
+  render(<TableOrderPage />);
+
+  await screen.findByRole("button", { name: /Table 4, occupied/i });
+  act(() => mockSocketHandlers["table:settled"]({
+    table: { id: "table-4", tableName: "Table 4", status: "dirty/cleaning", kots: [] },
+  }));
+
+  expect(await screen.findByRole("button", { name: /Table 4, dirty\/cleaning/i })).toBeInTheDocument();
+  expect(screen.getByText("1 active KOT")).toBeInTheDocument();
 });
 
 test("moves active table tickets to a vacant destination and refreshes the table list", async () => {

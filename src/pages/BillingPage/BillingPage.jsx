@@ -72,6 +72,11 @@ function newIdempotencyKey() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function indianPhoneDigits(value) {
+  const digits = value.replace(/\D/g, "");
+  return digits.startsWith("91") && digits.length === 12 ? digits.slice(2) : digits;
+}
+
 function allocateAmount(total, rows) {
   const totalCents = Math.round(total * 100);
   const weightTotal = rows.reduce((sum, row) => sum + row.weight, 0);
@@ -166,6 +171,8 @@ export default function BillingPage() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
   const [retryingWhatsApp, setRetryingWhatsApp] = useState(false);
+  const submitLock = useRef(false);
+  const submissionKey = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -349,7 +356,7 @@ export default function BillingPage() {
     : 0;
   const taxableAmount = Math.max(0, subtotal - discountAmount) + packagingAmount;
   const taxAmount = settings.taxEnabled
-    ? Math.round((taxableAmount * Math.max(0, Number(settings.taxRate) || 0) / 100 + Number.EPSILON) * 100) / 100
+    ? Math.floor(taxableAmount * Math.max(0, Number(settings.taxRate) || 0) / 100 + 0.5)
     : 0;
   const cgstAmount = Math.round((taxAmount / 2 + Number.EPSILON) * 100) / 100;
   const sgstAmount = Math.round((taxAmount - cgstAmount + Number.EPSILON) * 100) / 100;
@@ -416,8 +423,8 @@ export default function BillingPage() {
     : paymentMethod === "Cash"
       ? settings.allowBalanceDue || amountTendered >= total
       : Boolean(paymentMethod);
-  const normalizedPhone = customerPhone.replace(/[\s()+.-]/g, "");
-  const whatsappDetailsValid = !whatsappOptIn || /^\d{10,15}$/.test(normalizedPhone);
+  const normalizedPhone = indianPhoneDigits(customerPhone);
+  const whatsappDetailsValid = !whatsappOptIn || /^[6-9]\d{9}$/.test(normalizedPhone);
   const canComplete = Boolean(cart.length) && Boolean(paymentMethod) && !saving && tenderIsValid && promotionsLoaded && whatsappDetailsValid;
 
   function choosePaymentMethod(method) {
@@ -445,14 +452,14 @@ export default function BillingPage() {
     setCart((current) => {
       const existing = current.find((row) => row.id === item.id);
       return existing
-        ? current.map((row) => row.id === item.id ? { ...row, quantity: row.quantity + 1 } : row)
+        ? current.map((row) => row.id === item.id ? { ...row, quantity: Math.min(99, row.quantity + 1) } : row)
         : [...current, { ...item, quantity: 1 }];
     });
   }
 
   function adjustQuantity(id, amount) {
     setCart((current) => current
-      .map((row) => row.id === id ? { ...row, quantity: row.quantity + amount } : row)
+      .map((row) => row.id === id ? { ...row, quantity: Math.min(99, row.quantity + amount) } : row)
       .filter((row) => row.quantity > 0));
   }
 
@@ -538,7 +545,7 @@ export default function BillingPage() {
   }
 
   async function submitBill(authorization) {
-    if (!cart.length || saving) return;
+    if (!cart.length || saving || submitLock.current) return;
     if (!promotionsLoaded) {
       setPromotionRetry((value) => value + 1);
       setError("Scheduled discounts are still being verified. Try again when the check completes.");
@@ -555,8 +562,10 @@ export default function BillingPage() {
 
     setError("");
     setPartialNotice("");
+    submitLock.current = true;
     setSaving(true);
-    const idempotencyKey = newIdempotencyKey();
+    submissionKey.current ||= newIdempotencyKey();
+    const idempotencyKey = submissionKey.current;
     const tenderRows = paymentMethod === "Split"
       ? activeSplitTenders.map((row) => ({ method: row.method, amount: Number(row.amount), transactionRef: row.transactionRef }))
       : paymentMethod === "Cash"
@@ -587,6 +596,7 @@ export default function BillingPage() {
         tenders,
       });
       setCompletedBill(bill);
+      submissionKey.current = null;
       setPaymentOpen(false);
       setAutoPrintRequested(true);
       setRecentBills((current) => [bill, ...current.filter((entry) => entry.id !== bill.id)].slice(0, 5));
@@ -613,6 +623,7 @@ export default function BillingPage() {
         setPromotionRetry((value) => value + 1);
       }
     } finally {
+      submitLock.current = false;
       setSaving(false);
     }
   }
@@ -769,7 +780,7 @@ export default function BillingPage() {
                 <ButtonGroup size="small" className="billing-line__quantity" aria-label={`${row.name} quantity`}>
                   <IconButton aria-label={`Decrease ${row.name}`} onClick={() => adjustQuantity(row.id, -1)}><RemoveRoundedIcon fontSize="small" /></IconButton>
                   <span>{row.quantity}</span>
-                  <IconButton aria-label={`Increase ${row.name}`} onClick={() => adjustQuantity(row.id, 1)}><AddRoundedIcon fontSize="small" /></IconButton>
+                  <IconButton aria-label={`Increase ${row.name}`} disabled={row.quantity >= 99} onClick={() => adjustQuantity(row.id, 1)}><AddRoundedIcon fontSize="small" /></IconButton>
                 </ButtonGroup>
                 <Box className="billing-line__footer">
                   <strong className="billing-line__total">{row.comp ? "NC" : CURRENCY.format(row.price * row.quantity)}</strong>
@@ -1052,9 +1063,9 @@ export default function BillingPage() {
               label="Customer mobile number"
               placeholder="10-digit number or country code"
               value={customerPhone}
-              onChange={(event) => setCustomerPhone(event.target.value)}
-              error={!/^\d{10,15}$/.test(normalizedPhone)}
-              helperText={!/^\d{10,15}$/.test(normalizedPhone) ? "Enter a 10-digit Indian number or international number." : "A 10-digit Indian number or an international number is accepted."}
+              onChange={(event) => setCustomerPhone(event.target.value.replace(/\D/g, "").slice(0, 12))}
+              error={!/^[6-9]\d{9}$/.test(normalizedPhone)}
+              helperText={!/^[6-9]\d{9}$/.test(normalizedPhone) ? "Enter a valid 10-digit Indian mobile number (6–9 prefix); +91 is accepted." : "Valid Indian mobile number."}
               sx={{ mt: 1 }}
             />}
           </Box>
@@ -1101,9 +1112,9 @@ export default function BillingPage() {
             type="tel"
             label="Customer mobile number"
             value={customerPhone}
-            onChange={(event) => setCustomerPhone(event.target.value)}
-            error={!/^\d{10,15}$/.test(normalizedPhone)}
-            helperText={!/^\d{10,15}$/.test(normalizedPhone) ? "Enter a 10-digit Indian number or international number." : "A 10-digit Indian number or an international number is accepted."}
+            onChange={(event) => setCustomerPhone(event.target.value.replace(/\D/g, "").slice(0, 12))}
+            error={!/^[6-9]\d{9}$/.test(normalizedPhone)}
+            helperText={!/^[6-9]\d{9}$/.test(normalizedPhone) ? "Enter a valid 10-digit Indian mobile number (6–9 prefix); +91 is accepted." : "Valid Indian mobile number."}
           />}
           {!promotionsLoaded && <Alert severity="warning">Verifying scheduled discounts. Sale completion is paused.</Alert>}
         </DialogContent>

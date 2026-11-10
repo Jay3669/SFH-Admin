@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { logoutAdmin } from "../../services/authService";
+import { notifyApiError } from "../../utils/apiErrorStore";
 import {
   getSessionExpirySnapshot,
   dismissSessionExpiry,
@@ -25,7 +26,7 @@ export default function SessionExpiredDialog() {
   );
 
   function handleLogin() {
-    logoutAdmin();
+    logoutAdmin().catch((error) => notifyApiError(error.message || "Unable to clear the expired session."));
     window.history.replaceState({}, "", LOGIN_PATH);
     dismissSessionExpiry();
     window.dispatchEvent(new PopStateEvent("popstate"));

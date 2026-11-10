@@ -94,7 +94,5 @@ export async function updateKotItemStatus(kotNumber, itemId, status) {
 }
 
 export function connectKitchenSocket() {
-  const token = window.localStorage.getItem("authToken");
-  if (!token) throw new Error("A valid session is required to connect to the kitchen display.");
-  return io(API_BASE_URL, { auth: { token } });
+  return io(API_BASE_URL, { withCredentials: true });
 }

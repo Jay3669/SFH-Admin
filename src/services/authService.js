@@ -33,16 +33,6 @@ export async function loginAdmin(credentials) {
     throw new Error("This account does not have staff portal access.");
   }
 
-  const token =
-    response?.data?.token ||
-    response?.token ||
-    user?.token ||
-    response?.data?.accessToken ||
-    response?.accessToken;
-  if (!token) {
-    throw new Error("The login response did not include an authentication token.");
-  }
-
   const adminUser = {
     id: user?.id ? String(user.id) : "",
     name:
@@ -56,7 +46,7 @@ export async function loginAdmin(credentials) {
   };
 
   window.localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(adminUser));
-  window.localStorage.setItem(AUTH_TOKEN_KEY, token);
+  window.localStorage.removeItem(AUTH_TOKEN_KEY);
   resetSessionExpiry();
 
   return adminUser;
@@ -89,7 +79,7 @@ export function getStoredAdmin() {
   }
 }
 
-export function logoutAdmin() {
+export async function logoutAdmin() {
   const authenticationKey = /(auth|token|jwt|refresh|access|session|user)/i;
 
   [window.localStorage, window.sessionStorage].forEach((storage) => {
@@ -101,5 +91,11 @@ export function logoutAdmin() {
       }
     }
     keys.forEach((key) => storage.removeItem(key));
+  });
+  resetSessionExpiry();
+  await apiRequest(API_ENDPOINTS.userLogout, {
+    method: "POST",
+    skipGlobalLoader: true,
+    skipGlobalError: true,
   });
 }

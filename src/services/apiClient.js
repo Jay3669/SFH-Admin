@@ -26,7 +26,6 @@ export const axiosInstance = axios.create({
     withCredentials: true,
 });
 
-// attach token if exists
 axiosInstance.interceptors.request.use(
     (config) => {
         config.__skipGlobalFeedback = isAuthenticationRequest(config);
@@ -36,12 +35,7 @@ axiosInstance.interceptors.request.use(
             error.config = config;
             return Promise.reject(error);
         }
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            config.headers.Authorization = "Bearer " + token;
-        } else {
-            delete config.headers.Authorization;
-        }
+        delete config.headers.Authorization;
         if (!config.__skipGlobalFeedback) {
             config.__apiLoadingTracked = true;
             beginApiRequest();

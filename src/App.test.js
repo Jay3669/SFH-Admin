@@ -501,14 +501,7 @@ test('menu management supports category and menu item management', async () => {
 
   render(<MenuManagementPage />);
   expect(await screen.findByRole('heading', { name: 'Existing dish' })).toBeInTheDocument();
-  expect(global.fetch).toHaveBeenCalledWith(
-    expect.any(URL),
-    expect.objectContaining({
-      headers: expect.objectContaining({
-        Authorization: 'Bearer expired-access-token',
-      }),
-    })
-  );
+  expect(global.fetch.mock.calls[0][1]).toEqual(expect.objectContaining({ credentials: 'include' }));
 
   fireEvent.click(screen.getByRole('tab', { name: /categories/i }));
   fireEvent.click(screen.getByRole('button', { name: /add category/i }));

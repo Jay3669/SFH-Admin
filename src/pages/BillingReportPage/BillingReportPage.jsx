@@ -28,6 +28,7 @@ import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { getBillingReport } from "../../services/billingReport";
 import { closeCashDrawer, getCashDrawerSessions } from "../../services/cashDrawer";
 import { recordPurchasePayment, receivePurchase } from "../../services/inventoryService";
+import { voidPosSale } from "../../services/posService";
 import "./BillingReportPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" });
@@ -46,6 +47,7 @@ const SALES_FILTERS = [
   { value: "all", label: "All sales" },
   { value: "paid", label: "Paid" },
   { value: "partial", label: "Partially paid" },
+  { value: "voided", label: "Voided" },
 ];
 const EMPTY_BILLS = [];
 
@@ -67,6 +69,10 @@ function displayDate(value) {
 function purchasePaymentStatus(purchase) {
   if (purchase.status === "Cancelled") return "Cancelled";
   return purchase.due > 0 ? "Pending" : "Cleared";
+}
+
+function isVoidedSale(sale) {
+  return /^(voided|void|cancelled)$/i.test(sale.status || "");
 }
 
 function summarizeDayClose(report) {
@@ -142,6 +148,19 @@ function SalesDetails({ sale }) {
         <DetailRow label="Change" value={CURRENCY.format(sale.changeDue)} />
         <DetailRow label="Balance due" value={CURRENCY.format(sale.balanceDue)} />
       </Box>
+      {sale.voidAudit && (
+        <>
+          <Typography className="billing-report__detail-heading">Void audit</Typography>
+          <Box className="billing-report__detail-grid">
+            <DetailRow label="Reason" value={sale.voidAudit.reason} />
+            <DetailRow label="Previous status" value={sale.voidAudit.previousStatus} />
+            <DetailRow label="Amount" value={CURRENCY.format(sale.voidAudit.amount)} />
+            <DetailRow label="Voided at" value={displayDate(sale.voidAudit.voidedAt)} />
+            <DetailRow label="Requested by" value={sale.voidAudit.requestedBy} />
+            <DetailRow label="Approved by" value={sale.voidAudit.approvedBy} />
+          </Box>
+        </>
+      )}
     </>
   );
 }
@@ -188,6 +207,11 @@ export default function BillingReportPage({ onNavigate }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [voidingSale, setVoidingSale] = useState(null);
+  const [voidReason, setVoidReason] = useState("");
+  const [voidPin, setVoidPin] = useState("");
+  const [voidError, setVoidError] = useState("");
+  const [voidLoading, setVoidLoading] = useState(false);
   const [purchaseAction, setPurchaseAction] = useState("");
   const [actionAmount, setActionAmount] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
@@ -232,6 +256,7 @@ export default function BillingReportPage({ onNavigate }) {
   }), [purchases, purchaseFilter]);
   const filteredSales = useMemo(() => sales.filter((sale) => {
     if (salesFilter === "all") return true;
+    if (salesFilter === "voided") return isVoidedSale(sale);
     return salesFilter === "paid" ? sale.status === "Paid" : sale.status === "Partially paid";
   }), [sales, salesFilter]);
   const zTotals = useMemo(() => summarizeDayClose(zReport), [zReport]);
@@ -321,6 +346,35 @@ export default function BillingReportPage({ onNavigate }) {
     setActionError("");
   }
 
+  async function submitVoidSale(event) {
+    event.preventDefault();
+    if (!voidingSale) return;
+    const reason = voidReason.trim();
+    if (!reason) {
+      setVoidError("Enter a reason for voiding this bill.");
+      return;
+    }
+    if (!/^\d{4}$/.test(voidPin)) {
+      setVoidError("Enter the supervisor's 4-digit PIN.");
+      return;
+    }
+    setVoidLoading(true);
+    setVoidError("");
+    try {
+      await voidPosSale(voidingSale.id, { reason, pin: voidPin });
+      setVoidingSale(null);
+      setSelectedSale(null);
+      setVoidReason("");
+      setVoidPin("");
+      setNotice(`${voidingSale.billNumber} was voided and recorded in the audit trail.`);
+      setReloadKey((current) => current + 1);
+    } catch (voidFailure) {
+      setVoidError(voidFailure.message || "Unable to void this bill.");
+    } finally {
+      setVoidLoading(false);
+    }
+  }
+
   return (
     <Box className="billing-report app-content-width">
       <Box className="billing-report__intro">
@@ -344,7 +398,7 @@ export default function BillingReportPage({ onNavigate }) {
           <Typography className="billing-report__range">{displayDate(report.from)} – {displayDate(report.to)}</Typography>
           <Box className="billing-report__totals">
             <Card elevation={0}><CardContent><Typography>Purchase total</Typography><Typography component="p">{CURRENCY.format(report.purchases.total)}</Typography><Typography>{report.purchases.count} active purchases</Typography></CardContent></Card>
-            <Card elevation={0}><CardContent><Typography>Sales total</Typography><Typography component="p">{CURRENCY.format(report.sales.total)}</Typography><Typography>{report.sales.count} sales bills</Typography></CardContent></Card>
+            <Card elevation={0}><CardContent><Typography>Sales total</Typography><Typography component="p">{CURRENCY.format(report.sales.total)}</Typography><Typography>{report.sales.count} active · {sales.filter(isVoidedSale).length} voided bills</Typography></CardContent></Card>
             <Card className="billing-report__grand" elevation={0}><CardContent><Typography>Grand total · purchases + sales</Typography><Typography component="p">{CURRENCY.format(report.grandTotal)}</Typography><Typography>{report.purchases.count + report.sales.count} active bills</Typography></CardContent></Card>
           </Box>
           <Card className="billing-report__list" elevation={0}>
@@ -389,7 +443,7 @@ export default function BillingReportPage({ onNavigate }) {
                   <ToggleButtonGroup exclusive size="small" value={salesFilter} onChange={(_, value) => { if (value) setSalesFilter(value); }}>
                     {SALES_FILTERS.map((filter) => (
                       <ToggleButton key={filter.value} value={filter.value}>
-                        {filter.label} ({filter.value === "all" ? sales.length : sales.filter((sale) => filter.value === "paid" ? sale.status === "Paid" : sale.status === "Partially paid").length})
+                        {filter.label} ({filter.value === "all" ? sales.length : filter.value === "voided" ? sales.filter(isVoidedSale).length : sales.filter((sale) => filter.value === "paid" ? sale.status === "Paid" : sale.status === "Partially paid").length})
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
@@ -426,7 +480,53 @@ export default function BillingReportPage({ onNavigate }) {
       <Dialog open={Boolean(selectedSale)} onClose={() => setSelectedSale(null)} fullWidth maxWidth="sm">
         <DialogTitle>Sales bill details</DialogTitle>
         <DialogContent className="billing-report__dialog-content">{selectedSale && <SalesDetails sale={selectedSale} />}</DialogContent>
-        <DialogActions><Button onClick={() => setSelectedSale(null)}>Close</Button></DialogActions>
+        <DialogActions>
+          {selectedSale && !isVoidedSale(selectedSale) && (
+            <Button color="error" onClick={() => {
+              setVoidingSale(selectedSale);
+              setVoidReason("");
+              setVoidPin("");
+              setVoidError("");
+            }}>Void bill</Button>
+          )}
+          <Button onClick={() => setSelectedSale(null)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(voidingSale)} onClose={() => { if (!voidLoading) setVoidingSale(null); }} fullWidth maxWidth="xs">
+        <Box component="form" onSubmit={submitVoidSale}>
+          <DialogTitle>Void sales bill</DialogTitle>
+          <DialogContent className="billing-report__dialog-content">
+            {voidError && <Alert severity="error">{voidError}</Alert>}
+            <Typography>{voidingSale?.billNumber} · {CURRENCY.format(voidingSale?.total || 0)}</Typography>
+            <TextField
+              autoFocus
+              required
+              fullWidth
+              multiline
+              minRows={2}
+              label="Reason for void"
+              value={voidReason}
+              onChange={(event) => setVoidReason(event.target.value)}
+              slotProps={{ htmlInput: { maxLength: 500 } }}
+            />
+            <TextField
+              required
+              fullWidth
+              type="password"
+              label="Supervisor PIN"
+              value={voidPin}
+              onChange={(event) => setVoidPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
+              slotProps={{ htmlInput: { inputMode: "numeric", maxLength: 4, pattern: "\\d{4}" } }}
+            />
+            <Alert severity="warning">This records a void and excludes the bill from sales totals. Any cash refund must be reconciled separately.</Alert>
+          </DialogContent>
+          <DialogActions>
+            <Button disabled={voidLoading} onClick={() => setVoidingSale(null)}>Cancel</Button>
+            <Button disabled={voidLoading || !voidReason.trim() || !/^\d{4}$/.test(voidPin)} type="submit" variant="contained" color="error">
+              {voidLoading ? "Voiding…" : "Confirm void"}
+            </Button>
+          </DialogActions>
+        </Box>
       </Dialog>
       <Dialog open={Boolean(purchaseAction)} onClose={() => { if (!actionLoading) setPurchaseAction(""); }} fullWidth maxWidth="xs">
         <Box component="form" onSubmit={submitPurchaseAction}>
