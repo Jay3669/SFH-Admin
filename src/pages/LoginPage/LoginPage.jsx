@@ -122,7 +122,7 @@ export default function LoginPage({ onLogin }) {
 
         <Box className="login-card">
           <Box className="login-card__heading">
-            <Typography className="login-card__eyebrow">ADMIN PORTAL</Typography>
+            <Typography className="login-card__eyebrow">STAFF &amp; ADMIN PORTAL</Typography>
             <Typography component="h2" className="login-card__title">
               Sign in to your account
             </Typography>

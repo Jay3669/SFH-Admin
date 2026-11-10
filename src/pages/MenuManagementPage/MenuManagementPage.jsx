@@ -61,6 +61,7 @@ const EMPTY_ITEM = {
     imageUrl: "",
     isVegetarian: true,
     isAvailable: true,
+    kitchenStation: "Curry",
 };
 
 const EMPTY_CATEGORY = {
@@ -114,7 +115,8 @@ function normalizeItem(item) {
         price: String(item.price ?? ""),
         imageUrl: item.image_url || "",
         isVegetarian: String(item.food_type || "").toLowerCase() === "veg",
-        isAvailable: item.is_available !== false,
+        isAvailable: item.is_available !== false && item.is_available !== 0 && item.is_available !== "false",
+        kitchenStation: item.kitchen_station || "Curry",
     };
 }
 
@@ -156,6 +158,9 @@ export default function MenuManagementPage() {
     const [savingCategory, setSavingCategory] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [updatingItemId, setUpdatingItemId] = useState(null);
+    const [priceEditingId, setPriceEditingId] = useState(null);
+    const [inlinePrice, setInlinePrice] = useState("");
+    const [priceSaving, setPriceSaving] = useState(false);
     const menuLoadRequestId = useRef(0);
     const itemFilterRequestId = useRef(0);
 
@@ -293,6 +298,7 @@ export default function MenuManagementPage() {
             price: String(price),
             food_type: itemForm.isVegetarian ? "Veg" : "Non-Veg",
             image_url: itemForm.imageUrl.trim(),
+            kitchen_station: itemForm.kitchenStation,
         };
         setSavingItem(true);
         setFormError("");
@@ -454,6 +460,33 @@ export default function MenuManagementPage() {
             showNotice(getErrorMessage(error, "Unable to update item availability."), "error");
         } finally {
             setUpdatingItemId(null);
+        }
+    }
+
+    async function saveInlinePrice(item) {
+        const price = Number(inlinePrice);
+        if (!Number.isFinite(price) || price <= 0) {
+            showNotice("Enter a valid price greater than zero.", "error");
+            return;
+        }
+        setPriceSaving(true);
+        try {
+            const updatedItem = normalizeItem(await updateMenuItem(item.id, {
+                category_id: item.categoryId,
+                name: item.name,
+                description: item.description,
+                price: String(price),
+                food_type: item.isVegetarian ? "Veg" : "Non-Veg",
+                image_url: item.imageUrl,
+                is_available: item.isAvailable,
+            }));
+            setItems((current) => current.map((entry) => entry.id === item.id ? updatedItem : entry));
+            setPriceEditingId(null);
+            showNotice(`${item.name} price updated.`);
+        } catch (error) {
+            showNotice(getErrorMessage(error, "Unable to update menu item price."), "error");
+        } finally {
+            setPriceSaving(false);
         }
     }
 
@@ -657,7 +690,7 @@ export default function MenuManagementPage() {
                                     (entry) => entry.id === item.categoryId
                                 );
                                 return (
-                                    <Card className="menu-item-card" key={item.id} elevation={0}>
+                                    <Card className={`menu-item-card${item.isAvailable ? "" : " is-out-of-stock"}`} key={item.id} elevation={0}>
                                         <Box className="menu-item-card__image">
                                             {item.imageUrl ? (
                                                 <img
@@ -673,7 +706,7 @@ export default function MenuManagementPage() {
                                             <Chip
                                                 className={`menu-item-card__availability ${item.isAvailable ? "is-available" : "is-unavailable"
                                                     }`}
-                                                label={item.isAvailable ? "Available" : "Unavailable"}
+                                                label={item.isAvailable ? "Available" : "Out of stock"}
                                                 size="small"
                                             />
                                             <Box className="menu-item-card__image-details">
@@ -707,9 +740,34 @@ export default function MenuManagementPage() {
                                                     <Typography className="menu-item-card__image-description">
                                                         {item.description || "No description added yet."}
                                                     </Typography>
-                                                    <Typography className="menu-item-card__image-price">
-                                                        {formatPrice(item.price)}
-                                                    </Typography>
+                                                    {priceEditingId === item.id ? (
+                                                        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }} onClick={(event) => event.stopPropagation()}>
+                                                            <TextField
+                                                                autoFocus
+                                                                size="small"
+                                                                type="number"
+                                                                label="Price"
+                                                                value={inlinePrice}
+                                                                onChange={(event) => setInlinePrice(event.target.value)}
+                                                                onKeyDown={(event) => {
+                                                                    if (event.key === "Enter") saveInlinePrice(item);
+                                                                    if (event.key === "Escape") setPriceEditingId(null);
+                                                                }}
+                                                                slotProps={{ htmlInput: { min: 0.01, step: "0.01", "aria-label": `New price for ${item.name}` } }}
+                                                                sx={{ width: 130, bgcolor: "#fff", borderRadius: 1 }}
+                                                            />
+                                                            <Button size="small" variant="contained" disabled={priceSaving} onClick={() => saveInlinePrice(item)}>Save</Button>
+                                                            <Button size="small" onClick={() => setPriceEditingId(null)}>Cancel</Button>
+                                                        </Box>
+                                                    ) : (
+                                                        <Button
+                                                            className="menu-item-card__image-price"
+                                                            aria-label={`Edit price for ${item.name}`}
+                                                            onClick={() => { setPriceEditingId(item.id); setInlinePrice(String(item.price)); }}
+                                                        >
+                                                            {formatPrice(item.price)}
+                                                        </Button>
+                                                    )}
                                                 </Box>
                                             </Box>
                                         </Box>
@@ -717,15 +775,15 @@ export default function MenuManagementPage() {
                                             <Box className="menu-item-card__footer">
                                                 <Box className="menu-item-card__availability-control">
                                                     <Switch
-                                                        checked={item.isAvailable}
+                                                        checked={!item.isAvailable}
                                                         onChange={() => toggleAvailability(item)}
                                                         size="small"
                                                         disabled={updatingItemId === item.id}
                                                         slotProps={{
-                                                            input: { "aria-label": `Availability for ${item.name}` },
+                                                            input: { "aria-label": item.isAvailable ? `Mark ${item.name} out of stock` : `Mark ${item.name} available` },
                                                         }}
                                                     />
-                                                    <Typography>Available</Typography>
+                                                    <Typography>{item.isAvailable ? "In stock" : "Out of stock"}</Typography>
                                                 </Box>
                                                 <Box className="menu-item-card__actions">
                                                     <EditActionButton tooltip={`Edit ${item.name}`} aria-label={`Edit ${item.name}`} onClick={() => openEditItem(item)} />
@@ -949,6 +1007,24 @@ export default function MenuManagementPage() {
                                     fullWidth
                                 />
                             </Box>
+                            <FormControl fullWidth required>
+                                <InputLabel id="menu-item-kitchen-station-label">Kitchen station</InputLabel>
+                                <Select
+                                    labelId="menu-item-kitchen-station-label"
+                                    label="Kitchen station"
+                                    value={itemForm.kitchenStation}
+                                    onChange={(event) =>
+                                        setItemForm((current) => ({
+                                            ...current,
+                                            kitchenStation: event.target.value,
+                                        }))
+                                    }
+                                >
+                                    {["Tandoor", "Curry", "Starters", "Beverages"].map((station) => (
+                                        <MenuItem value={station} key={station}>{station}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             <TextField
                                 label="Description"
                                 placeholder="Describe the dish, ingredients, or flavor."

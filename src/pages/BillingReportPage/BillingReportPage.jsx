@@ -24,7 +24,9 @@ import {
   Typography,
 } from "@mui/material";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
+import PrintRoundedIcon from "@mui/icons-material/PrintRounded";
 import { getBillingReport } from "../../services/billingReport";
+import { closeCashDrawer, getCashDrawerSessions } from "../../services/cashDrawer";
 import { recordPurchasePayment, receivePurchase } from "../../services/inventoryService";
 import "./BillingReportPage.css";
 
@@ -65,6 +67,38 @@ function displayDate(value) {
 function purchasePaymentStatus(purchase) {
   if (purchase.status === "Cancelled") return "Cancelled";
   return purchase.due > 0 ? "Pending" : "Cleared";
+}
+
+function summarizeDayClose(report) {
+  const bills = report?.sales?.bills || [];
+  const voidBills = bills.filter((sale) => /void|cancel/i.test(sale.status || ""));
+  const validBills = bills.filter((sale) => !/void|cancel/i.test(sale.status || ""));
+  const tenders = { Cash: 0, Card: 0, UPI: 0 };
+  validBills.forEach((sale) => {
+    if (sale.tenders?.length) {
+      sale.tenders.forEach((tender) => {
+        const method = tender.method in tenders ? tender.method : "";
+        if (method) {
+          const amount = Number(tender.amount) || 0;
+          tenders[method] += method === "Cash" ? Math.max(0, amount - (Number(sale.changeDue) || 0)) : amount;
+        }
+      });
+    } else {
+      const method = sale.paymentMethod in tenders ? sale.paymentMethod : "";
+      if (method) tenders[method] += Number(sale.amountPaid ?? sale.total) || 0;
+    }
+  });
+  const grossSales = validBills.reduce((sum, sale) => sum + (Number(sale.subtotal) || 0), 0);
+  const discounts = validBills.reduce((sum, sale) => sum + (Number(sale.discount) || 0), 0);
+  return {
+    grossSales,
+    netSales: Math.max(0, grossSales - discounts),
+    taxes: validBills.reduce((sum, sale) => sum + (Number(sale.tax) || 0), 0),
+    discounts,
+    voidCount: voidBills.length,
+    voidTotal: voidBills.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0),
+    tenders,
+  };
 }
 
 function DetailRow({ label, value }) {
@@ -160,6 +194,16 @@ export default function BillingReportPage({ onNavigate }) {
   const [actionError, setActionError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [notice, setNotice] = useState("");
+  const [zReportOpen, setZReportOpen] = useState(false);
+  const [zReport, setZReport] = useState(null);
+  const [zDrawer, setZDrawer] = useState(null);
+  const [zReportLoading, setZReportLoading] = useState(false);
+  const [zReportError, setZReportError] = useState("");
+  const [closeConfirmationOpen, setCloseConfirmationOpen] = useState(false);
+  const [physicalCash, setPhysicalCash] = useState("");
+  const [cashTaken, setCashTaken] = useState("0");
+  const [closingBusy, setClosingBusy] = useState(false);
+  const [closingError, setClosingError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -190,6 +234,60 @@ export default function BillingReportPage({ onNavigate }) {
     if (salesFilter === "all") return true;
     return salesFilter === "paid" ? sale.status === "Paid" : sale.status === "Partially paid";
   }), [sales, salesFilter]);
+  const zTotals = useMemo(() => summarizeDayClose(zReport), [zReport]);
+
+  async function openZReport() {
+    setZReportOpen(true);
+    setZReportLoading(true);
+    setZReportError("");
+    try {
+      const [dailyReport, drawers] = await Promise.all([
+        getBillingReport("daily"),
+        getCashDrawerSessions(),
+      ]);
+      setZReport(dailyReport);
+      setZDrawer(drawers.find((drawer) => drawer.date === dailyReport.from && drawer.status === "open")
+        || drawers.find((drawer) => drawer.date === dailyReport.from)
+        || null);
+      setPhysicalCash("");
+      setCashTaken("0");
+    } catch (loadError) {
+      setZReportError(loadError.message || "Unable to load the day-close report.");
+    } finally {
+      setZReportLoading(false);
+    }
+  }
+
+  async function finalizeCashierShift() {
+    const actualCash = Number(physicalCash);
+    const taken = Number(cashTaken);
+    if (!zDrawer || zDrawer.status !== "open") {
+      setClosingError("There is no open cashier shift to finalize.");
+      return;
+    }
+    if (!physicalCash.trim() || !cashTaken.trim() || !Number.isFinite(actualCash) || actualCash < 0
+      || !Number.isFinite(taken) || taken < 0 || taken > actualCash) {
+      setClosingError("Enter a valid physical count and cash-taken amount no greater than the count.");
+      return;
+    }
+    setClosingBusy(true);
+    setClosingError("");
+    try {
+      await closeCashDrawer(zDrawer.id, { actualCash, cashTaken: taken });
+      setCloseConfirmationOpen(false);
+      setNotice("Cashier shift closed. This does not lock the restaurant-wide business day.");
+      try {
+        const drawers = await getCashDrawerSessions();
+        setZDrawer(drawers.find((drawer) => drawer.id === zDrawer.id) || null);
+      } catch (refreshError) {
+        setZReportError(`Shift was closed, but the drawer summary could not refresh: ${refreshError.message}`);
+      }
+    } catch (closeError) {
+      setClosingError(closeError.message || "Unable to close the cashier shift.");
+    } finally {
+      setClosingBusy(false);
+    }
+  }
 
   async function submitPurchaseAction(event) {
     event.preventDefault();
@@ -234,6 +332,7 @@ export default function BillingReportPage({ onNavigate }) {
         <ToggleButtonGroup exclusive size="small" value={period} aria-label="Report period" onChange={(_, value) => { if (value) setPeriod(value); }}>
           {PERIODS.map((option) => <ToggleButton key={option.value} value={option.value}>{option.label}</ToggleButton>)}
         </ToggleButtonGroup>
+        <Button variant="outlined" startIcon={<PrintRoundedIcon />} onClick={openZReport}>Z report &amp; day close</Button>
       </Box>
 
       {error && <Alert severity="error" action={<Button color="inherit" size="small" startIcon={<RefreshRoundedIcon />} onClick={() => setReloadKey((current) => current + 1)}>Retry</Button>}>{error}</Alert>}
@@ -350,6 +449,64 @@ export default function BillingReportPage({ onNavigate }) {
           </DialogContent>
           <DialogActions><Button disabled={actionLoading} onClick={() => setPurchaseAction("")}>Cancel</Button><Button disabled={actionLoading} type="submit" variant="contained">{actionLoading ? "Saving…" : purchaseAction === "payment" ? "Save payment" : "Confirm receipt"}</Button></DialogActions>
         </Box>
+      </Dialog>
+
+      <Dialog open={zReportOpen} onClose={() => { if (!closingBusy) setZReportOpen(false); }} fullWidth maxWidth="sm">
+        <DialogTitle>Day-close Z report</DialogTitle>
+        <DialogContent className="billing-report__dialog-content">
+          {zReportError && <Alert severity="error" action={<Button color="inherit" size="small" onClick={openZReport}>Retry</Button>}>{zReportError}</Alert>}
+          {zReportLoading ? <Box className="billing-report__loading"><CircularProgress size={26} /><Typography>Loading day totals…</Typography></Box> : zReport && (
+            <Box className="billing-report__z-receipt">
+              <Typography component="h2">Daily reconciliation</Typography>
+              <Typography className="billing-report__z-date">{displayDate(zReport.from)} · {zReport.sales.count} sale bills</Typography>
+              <DetailRow label="Gross sales" value={CURRENCY.format(zTotals.grossSales)} />
+              <DetailRow label="Discounts" value={`− ${CURRENCY.format(zTotals.discounts)}`} />
+              <DetailRow label="Net sales" value={CURRENCY.format(zTotals.netSales)} />
+              <DetailRow label="Taxes collected" value={CURRENCY.format(zTotals.taxes)} />
+              <Typography className="billing-report__detail-heading">Tender breakdown</Typography>
+              {Object.entries(zTotals.tenders).map(([method, totalAmount]) => (
+                <DetailRow key={method} label={method} value={CURRENCY.format(totalAmount)} />
+              ))}
+              <Typography className="billing-report__detail-heading">Voids / losses</Typography>
+              <DetailRow label={`${zTotals.voidCount} void or cancelled bills`} value={CURRENCY.format(zTotals.voidTotal)} />
+              <Typography className="billing-report__detail-heading">Cash drawer reconciliation</Typography>
+              {zDrawer ? (
+                <>
+                  <DetailRow label="Cashier shift" value={`${zDrawer.cashierName || "Cashier"} · ${zDrawer.status}`} />
+                  <DetailRow label="System cash expected" value={CURRENCY.format(zDrawer.expectedCash)} />
+                  <DetailRow
+                    label={zDrawer.status === "closed" ? "Physical cash counted" : "Physical cash"}
+                    value={zDrawer.actualCash === null ? "Count during shift close" : CURRENCY.format(zDrawer.actualCash)}
+                  />
+                  {zDrawer.status === "closed" && <DetailRow label="Cash variance" value={CURRENCY.format(zDrawer.variance || 0)} />}
+                </>
+              ) : <Typography className="billing-report__empty">No cashier shift was found for this business date.</Typography>}
+              <Alert severity="warning">Closing a cashier shift does not lock sales or other shifts for the restaurant-wide business day.</Alert>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions className="billing-report__z-actions">
+          <Button startIcon={<PrintRoundedIcon />} onClick={() => window.print()} disabled={!zReport || zReportLoading}>Print Z-Chit</Button>
+          <Button onClick={() => window.print()} disabled={!zReport || zReportLoading}>Export / Save as PDF</Button>
+          {zDrawer?.status === "open" && <Button variant="contained" onClick={() => { setClosingError(""); setCloseConfirmationOpen(true); }}>Finalize cashier shift</Button>}
+          <Button onClick={() => setZReportOpen(false)} disabled={closingBusy}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={closeConfirmationOpen} onClose={() => { if (!closingBusy) setCloseConfirmationOpen(false); }} fullWidth maxWidth="xs">
+        <DialogTitle>Confirm cashier shift close</DialogTitle>
+        <DialogContent className="billing-report__dialog-content">
+          <Alert severity="warning">This closes only {zDrawer?.cashierName || "the current cashier"}’s shift. It does not lock the business day or stop other cashiers from trading.</Alert>
+          <DetailRow label="System cash expected" value={CURRENCY.format(zDrawer?.expectedCash || 0)} />
+          <TextField autoFocus required fullWidth type="number" label="Physical cash counted (₹)" value={physicalCash} onChange={(event) => setPhysicalCash(event.target.value)} slotProps={{ htmlInput: { min: 0, step: "0.01" } }} />
+          <TextField required fullWidth type="number" label="Cash taken / deposit (₹)" value={cashTaken} onChange={(event) => setCashTaken(event.target.value)} slotProps={{ htmlInput: { min: 0, step: "0.01" } }} />
+          {physicalCash !== "" && <DetailRow label="Variance" value={CURRENCY.format(Number(physicalCash) - Number(zDrawer?.expectedCash || 0))} />}
+          {closingError && <Alert severity="error">{closingError}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCloseConfirmationOpen(false)} disabled={closingBusy}>Cancel</Button>
+          <Button variant="contained" color="error" disabled={closingBusy} onClick={finalizeCashierShift}>{closingBusy ? "Closing…" : "Confirm shift close"}</Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

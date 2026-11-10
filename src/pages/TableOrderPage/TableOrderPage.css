@@ -1,0 +1,24 @@
+.table-order-print-only {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .table-order-print-only,
+  .table-order-print-only * {
+    visibility: visible !important;
+  }
+
+  .table-order-print-only {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    color: #000;
+    background: #fff;
+  }
+}

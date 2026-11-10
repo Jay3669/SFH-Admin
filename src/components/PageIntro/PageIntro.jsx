@@ -3,6 +3,8 @@ import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import RestaurantMenuRoundedIcon from "@mui/icons-material/RestaurantMenuRounded";
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import PointOfSaleRoundedIcon from "@mui/icons-material/PointOfSaleRounded";
+import TableBarRoundedIcon from "@mui/icons-material/TableBarRounded";
+import KitchenRoundedIcon from "@mui/icons-material/KitchenRounded";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
@@ -19,6 +21,8 @@ const PAGE_COPY = {
   inventory: ["Inventory management", "Monitor stock, purchases, consumption, and availability.", Inventory2RoundedIcon],
   "inventory-purchases": ["Inventory purchases", "Record supplier purchases and manage incoming stock.", Inventory2RoundedIcon],
   billing: ["Billing & POS", "Create customer bills, take orders, and manage payments.", PointOfSaleRoundedIcon],
+  "table-orders": ["Table orders", "Fire table orders to separate kitchen stations.", TableBarRoundedIcon],
+  kitchen: ["Kitchen display", "Receive live kitchen tickets and update item progress.", KitchenRoundedIcon],
   reports: ["Purchases & sales", "Analyze bills, sales activity, and purchase performance.", AssessmentRoundedIcon],
   notifications: ["Notifications", "View important business updates and operational alerts.", NotificationsNoneRoundedIcon],
   "financial-health": ["Financial health", "Review revenue, expenses, reserves, and profitability.", AccountBalanceWalletOutlinedIcon],
@@ -32,11 +36,12 @@ const PAGE_COPY = {
 
 export default function PageIntro({ page }) {
   const [title, description, Icon] = PAGE_COPY[page] || PAGE_COPY.dashboard;
+  const isPrimaryPageHeading = ["dashboard", "cash-drawer"].includes(page);
 
   return (
-    <Box className="page-intro" role="banner">
+    <Box className="page-intro">
       <Box className="page-intro__copy">
-        <Typography component="h1">{title}</Typography>
+        <Typography component={isPrimaryPageHeading ? "h1" : "p"}>{title}</Typography>
         <Typography>{description}</Typography>
       </Box>
       <Box className="page-intro__icon" aria-hidden="true">

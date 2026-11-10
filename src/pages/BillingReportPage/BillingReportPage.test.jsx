@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import BillingReportPage from "./BillingReportPage";
 import { getBillingReport } from "../../services/billingReport";
+import { closeCashDrawer, getCashDrawerSessions } from "../../services/cashDrawer";
 import { recordPurchasePayment, receivePurchase } from "../../services/inventoryService";
 
 jest.mock("../../services/billingReport", () => ({
@@ -10,6 +11,11 @@ jest.mock("../../services/billingReport", () => ({
 jest.mock("../../services/inventoryService", () => ({
   recordPurchasePayment: jest.fn(),
   receivePurchase: jest.fn(),
+}));
+
+jest.mock("../../services/cashDrawer", () => ({
+  closeCashDrawer: jest.fn(),
+  getCashDrawerSessions: jest.fn(),
 }));
 
 function createReport(period) {
@@ -66,7 +72,16 @@ function createReport(period) {
 }
 
 beforeEach(() => {
+  window.print = jest.fn();
   getBillingReport.mockImplementation(async (period) => createReport(period));
+  getCashDrawerSessions.mockResolvedValue([{
+    id: "drawer-1",
+    date: "2026-11-07",
+    status: "open",
+    cashierName: "Test Cashier",
+    expectedCash: 450,
+  }]);
+  closeCashDrawer.mockResolvedValue({ success: true });
 });
 
 test("shows purchase, sales, and grand totals and their bills", async () => {
@@ -146,4 +161,24 @@ test("launches the existing purchase and sales creation flows from their tabs", 
   fireEvent.click(screen.getByRole("tab", { name: /sales/i }));
   fireEvent.click(screen.getByRole("button", { name: /new sale/i }));
   expect(onNavigate).toHaveBeenLastCalledWith("billing");
+});
+
+test("shows the Z report and closes only the current cashier shift after confirmation", async () => {
+  render(<BillingReportPage />);
+  await screen.findByText("PO-123");
+
+  fireEvent.click(screen.getByRole("button", { name: /z report & day close/i }));
+  const reportDialog = await screen.findByRole("dialog", { name: /day-close z report/i });
+  await within(reportDialog).findByText("Gross sales");
+  expect(within(reportDialog).getByText("Gross sales")).toBeInTheDocument();
+  expect(within(reportDialog).getByText("System cash expected")).toBeInTheDocument();
+  fireEvent.click(within(reportDialog).getByRole("button", { name: /finalize cashier shift/i }));
+
+  const confirmation = await screen.findByRole("dialog", { name: /confirm cashier shift close/i });
+  fireEvent.change(within(confirmation).getByRole("spinbutton", { name: /physical cash counted/i }), { target: { value: "500" } });
+  fireEvent.change(within(confirmation).getByRole("spinbutton", { name: /cash taken/i }), { target: { value: "50" } });
+  fireEvent.click(within(confirmation).getByRole("button", { name: /confirm shift close/i }));
+
+  await waitFor(() => expect(closeCashDrawer).toHaveBeenCalledWith("drawer-1", { actualCash: 500, cashTaken: 50 }));
+  expect(await screen.findByText(/does not lock the restaurant-wide business day/i)).toBeInTheDocument();
 });

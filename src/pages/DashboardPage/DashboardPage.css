@@ -7,9 +7,10 @@
 .dashboard-range-controls .MuiFormControl-root:first-child { width:145px; }
 .dashboard-range-controls .MuiTextField-root { width:145px; }
 .dashboard-state { display:flex; min-height:120px; align-items:center; justify-content:center; gap:.75rem; color:var(--text-secondary); }
-.dashboard-stats { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.85rem; }
+.dashboard-stats { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.85rem; }
 .dashboard-stat.MuiCard-root { min-width:0; min-height:132px; border:1px solid var(--border-color); border-radius:14px; background:var(--surface); box-shadow:0 5px 18px rgb(19 22 39 / 5%); transition:transform .18s ease,box-shadow .18s ease; }
 .dashboard-stat.MuiCard-root:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgb(19 22 39 / 10%); }
+.dashboard-stat__action.MuiCardActionArea-root { height:100%; border-radius:inherit; }
 .dashboard-stat .MuiCardContent-root { height:100%; padding:1rem; }
 .dashboard-stat__summary { display:flex; justify-content:space-between; gap:.65rem; }
 .dashboard-stat__summary > div:first-child { min-width:0; }
@@ -25,6 +26,11 @@
 .dashboard-stat__change svg { width:16px;height:16px; }
 .dashboard-stat__change.is-positive { color:#25834a; }
 .dashboard-stat__change.is-negative { color:#c74646; }
+.dashboard-stat__change.is-neutral { color:var(--text-secondary); }
+.dashboard-operational-snapshot { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.55rem; }
+.dashboard-operational-snapshot > div { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:.4rem; padding:.55rem .7rem; border:1px solid var(--border-color); border-radius:10px; background:var(--surface); }
+.dashboard-operational-snapshot p { color:var(--text-secondary); font-size:.65rem; }
+.dashboard-operational-snapshot strong { overflow:hidden; font-size:.68rem; text-overflow:ellipsis; white-space:nowrap; }
 .dashboard-analytics-grid,.dashboard-secondary-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(280px,1fr); gap:.85rem; }
 .dashboard-secondary-grid--wide { grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr); }
 .dashboard-chart-card.MuiCard-root,.dashboard-table-card.MuiCard-root,.dashboard-side-card.MuiCard-root { min-width:0; border:1px solid var(--border-color); border-radius:14px; background:var(--surface); box-shadow:0 5px 18px rgb(19 22 39 / 4%); }
@@ -59,6 +65,6 @@
 .dashboard-no-data { display:grid;min-height:160px;place-items:center;color:var(--text-secondary);font-size:.72rem;text-align:center; }
 
 @media (max-width:1199px) { .dashboard-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }.dashboard-hero { align-items:flex-start;flex-direction:column; } }
-@media (max-width:1023px) { .dashboard-analytics-grid,.dashboard-secondary-grid,.dashboard-secondary-grid--wide { grid-template-columns:minmax(0,1fr); }.dashboard-range-controls { width:100%;flex-wrap:wrap; }.dashboard-range-controls .MuiFormControl-root:first-child,.dashboard-range-controls .MuiTextField-root { flex:1 1 145px;width:auto; } }
-@media (max-width:767px) { .dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }.dashboard-hero { padding:1rem; }.dashboard-table-card { overflow-x:auto; }.dashboard-table-card .MuiTable-root { min-width:560px; } }
+@media (max-width:1023px) { .dashboard-analytics-grid,.dashboard-secondary-grid,.dashboard-secondary-grid--wide { grid-template-columns:minmax(0,1fr); }.dashboard-operational-snapshot { grid-template-columns:repeat(3,minmax(0,1fr)); }.dashboard-range-controls { width:100%;flex-wrap:wrap; }.dashboard-range-controls .MuiFormControl-root:first-child,.dashboard-range-controls .MuiTextField-root { flex:1 1 145px;width:auto; } }
+@media (max-width:767px) { .dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }.dashboard-operational-snapshot { grid-template-columns:repeat(2,minmax(0,1fr)); }.dashboard-hero { padding:1rem; }.dashboard-table-card { overflow-x:auto; }.dashboard-table-card .MuiTable-root { min-width:560px; } }
 @media (max-width:479px) { .dashboard-page { gap:.9rem; }.dashboard-stats { grid-template-columns:minmax(0,1fr); }.dashboard-range-controls { display:grid;grid-template-columns:minmax(0,1fr); }.dashboard-range-controls .MuiFormControl-root:first-child,.dashboard-range-controls .MuiTextField-root { width:100%; }.dashboard-stat.MuiCard-root { min-height:118px; }.dashboard-hero h1.MuiTypography-root { font-size:1.35rem; } }

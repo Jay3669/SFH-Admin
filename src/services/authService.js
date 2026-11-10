@@ -29,8 +29,8 @@ export async function loginAdmin(credentials) {
     user?.role || user?.userRole || response?.role || ""
   ).toLowerCase();
 
-  if (role !== "admin") {
-    throw new Error("This account does not have admin portal access.");
+  if (!["admin", "manager", "employee"].includes(role)) {
+    throw new Error("This account does not have staff portal access.");
   }
 
   const token =
@@ -44,6 +44,7 @@ export async function loginAdmin(credentials) {
   }
 
   const adminUser = {
+    id: user?.id ? String(user.id) : "",
     name:
       user?.name ||
       user?.fullName ||
@@ -82,7 +83,7 @@ export async function resetPassword(token, password) {
 export function getStoredAdmin() {
   try {
     const user = JSON.parse(window.localStorage.getItem(ADMIN_USER_KEY) || "null");
-    return user?.role === "admin" ? user : null;
+    return ["admin", "manager", "employee"].includes(user?.role) ? user : null;
   } catch {
     return null;
   }

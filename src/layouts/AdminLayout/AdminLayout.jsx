@@ -28,7 +28,13 @@ import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalance
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import PersonSearchOutlinedIcon from "@mui/icons-material/PersonSearchOutlined";
 import PointOfSaleOutlinedIcon from "@mui/icons-material/PointOfSaleOutlined";
+import TableBarRoundedIcon from "@mui/icons-material/TableBarRounded";
+import KitchenRoundedIcon from "@mui/icons-material/KitchenRounded";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded";
+import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
+import DeliveryDiningRoundedIcon from "@mui/icons-material/DeliveryDiningRounded";
+import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import logo from "../../assets/branding/shf-logo.png";
@@ -51,6 +57,7 @@ export default function AdminLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("lg"));
+  const showAdminWorkspace = !["employee", "manager"].includes(user?.role);
 
   const drawer = (
     <Box className="admin-sidebar">
@@ -58,11 +65,13 @@ export default function AdminLayout({
         <img src={logo} alt="" />
         <Box>
           <Typography className="admin-sidebar__brand-name">Surya Food Hub</Typography>
-          <Typography className="admin-sidebar__brand-caption">ADMIN PORTAL</Typography>
+          <Typography className="admin-sidebar__brand-caption">{showAdminWorkspace ? "ADMIN PORTAL" : "STAFF PORTAL"}</Typography>
         </Box>
       </Box>
       <Typography className="admin-sidebar__section-label">WORKSPACE</Typography>
       <List className="admin-sidebar__nav" disablePadding>
+        {showAdminWorkspace ? (
+          <>
         <ListItemButton
           className={`admin-sidebar__nav-item ${
             activePage === "dashboard" ? "is-active" : ""
@@ -92,6 +101,22 @@ export default function AdminLayout({
             <RestaurantMenuRoundedIcon />
           </ListItemIcon>
           <ListItemText primary="Menu management" />
+        </ListItemButton>
+        <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "promotions" ? "is-active" : ""}`}
+          selected={activePage === "promotions"}
+          onClick={() => { onNavigate("promotions"); setMobileOpen(false); }}
+        >
+          <ListItemIcon><LocalOfferRoundedIcon /></ListItemIcon>
+          <ListItemText primary="Happy hour" />
+        </ListItemButton>
+        <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "qr-codes" ? "is-active" : ""}`}
+          selected={activePage === "qr-codes"}
+          onClick={() => { onNavigate("qr-codes"); setMobileOpen(false); }}
+        >
+          <ListItemIcon><QrCode2RoundedIcon /></ListItemIcon>
+          <ListItemText primary="Table QR codes" />
         </ListItemButton>
         <ListItemButton
           className={`admin-sidebar__nav-item ${
@@ -124,6 +149,28 @@ export default function AdminLayout({
           <ListItemText primary="Billing & POS" />
         </ListItemButton>
         <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "table-orders" ? "is-active" : ""}`}
+          selected={activePage === "table-orders"}
+          onClick={() => {
+            onNavigate("table-orders");
+            setMobileOpen(false);
+          }}
+        >
+          <ListItemIcon><TableBarRoundedIcon /></ListItemIcon>
+          <ListItemText primary="Table orders" />
+        </ListItemButton>
+        <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "kitchen" ? "is-active" : ""}`}
+          selected={activePage === "kitchen"}
+          onClick={() => {
+            onNavigate("kitchen");
+            setMobileOpen(false);
+          }}
+        >
+          <ListItemIcon><KitchenRoundedIcon /></ListItemIcon>
+          <ListItemText primary="Kitchen display" />
+        </ListItemButton>
+        <ListItemButton
           className={`admin-sidebar__nav-item ${
             activePage === "reports" ? "is-active" : ""
           }`}
@@ -148,6 +195,22 @@ export default function AdminLayout({
         >
           <ListItemIcon><ReceiptLongOutlinedIcon /></ListItemIcon>
           <ListItemText primary="Orders Management" />
+        </ListItemButton>
+        <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "aggregator-orders" ? "is-active" : ""}`}
+          selected={activePage === "aggregator-orders"}
+          onClick={() => { onNavigate("aggregator-orders"); setMobileOpen(false); }}
+        >
+          <ListItemIcon><DeliveryDiningRoundedIcon /></ListItemIcon>
+          <ListItemText primary="Swiggy & Zomato" />
+        </ListItemButton>
+        <ListItemButton
+          className={`admin-sidebar__nav-item ${activePage === "kitchen-analytics" ? "is-active" : ""}`}
+          selected={activePage === "kitchen-analytics"}
+          onClick={() => { onNavigate("kitchen-analytics"); setMobileOpen(false); }}
+        >
+          <ListItemIcon><QueryStatsRoundedIcon /></ListItemIcon>
+          <ListItemText primary="Kitchen analytics" />
         </ListItemButton>
         <ListItemButton
           className={`admin-sidebar__nav-item ${
@@ -227,6 +290,43 @@ export default function AdminLayout({
           </ListItemIcon>
           <ListItemText primary="Settings" />
         </ListItemButton>
+          </>
+        ) : (
+          <>
+            <ListItemButton
+              className={`admin-sidebar__nav-item ${activePage === "billing" ? "is-active" : ""}`}
+              selected={activePage === "billing"}
+              onClick={() => { onNavigate("billing"); setMobileOpen(false); }}
+            >
+              <ListItemIcon><PointOfSaleRoundedIcon /></ListItemIcon>
+              <ListItemText primary="Billing & POS" />
+            </ListItemButton>
+            <ListItemButton
+              className={`admin-sidebar__nav-item ${activePage === "table-orders" ? "is-active" : ""}`}
+              selected={activePage === "table-orders"}
+              onClick={() => { onNavigate("table-orders"); setMobileOpen(false); }}
+            >
+              <ListItemIcon><TableBarRoundedIcon /></ListItemIcon>
+              <ListItemText primary="Table orders" />
+            </ListItemButton>
+            <ListItemButton
+              className={`admin-sidebar__nav-item ${activePage === "kitchen" ? "is-active" : ""}`}
+              selected={activePage === "kitchen"}
+              onClick={() => { onNavigate("kitchen"); setMobileOpen(false); }}
+            >
+              <ListItemIcon><KitchenRoundedIcon /></ListItemIcon>
+              <ListItemText primary="Kitchen display" />
+            </ListItemButton>
+            <ListItemButton
+              className={`admin-sidebar__nav-item ${activePage === "cash-drawer" ? "is-active" : ""}`}
+              selected={activePage === "cash-drawer"}
+              onClick={() => { onNavigate("cash-drawer"); setMobileOpen(false); }}
+            >
+              <ListItemIcon><PointOfSaleOutlinedIcon /></ListItemIcon>
+              <ListItemText primary="Cash drawer & shift" />
+            </ListItemButton>
+          </>
+        )}
       </List>
       <Box className="admin-sidebar__bottom">
         <Divider />
@@ -255,7 +355,7 @@ export default function AdminLayout({
               {user?.name || "Administrator"}
             </Typography>
             <Typography noWrap className="admin-sidebar__user-role">
-              Administrator
+              {user?.role || "Administrator"}
             </Typography>
           </Box>
           <IconButton
@@ -278,7 +378,7 @@ export default function AdminLayout({
     <Box className="admin-shell">
       <ConfirmationDialog
         open={logoutConfirmOpen}
-        title="Sign out of the admin panel?"
+        title="Sign out of your account?"
         message={<Typography>Are you sure you want to sign out? You will need to log in again to continue.</Typography>}
         confirmLabel="Sign out"
         destructive
@@ -341,6 +441,10 @@ export default function AdminLayout({
                     ? "Inventory & stock"
                     : activePage === "billing"
                       ? "Billing & POS"
+                      : activePage === "table-orders"
+                        ? "Table orders"
+                        : activePage === "kitchen"
+                          ? "Kitchen display"
                       : activePage === "settings"
                         ? "Settings"
                         : activePage === "reports"
@@ -368,6 +472,10 @@ export default function AdminLayout({
                     ? "Manage inventory and stock"
                     : activePage === "billing"
                       ? "Take orders and close bills"
+                      : activePage === "table-orders"
+                        ? "Send table orders to kitchen stations"
+                        : activePage === "kitchen"
+                          ? "Monitor and update live kitchen tickets"
                       : activePage === "settings"
                         ? "Configure billing options"
                         : activePage === "reports"

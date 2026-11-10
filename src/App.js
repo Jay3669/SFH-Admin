@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import MenuManagementPage from "./pages/MenuManagementPage/MenuManagementPage";
 import InventoryPage from "./pages/InventoryPage/InventoryPage";
 import BillingPage from "./pages/BillingPage/BillingPage";
+import TableOrderPage from "./pages/TableOrderPage/TableOrderPage";
+import KitchenDisplayPage from "./pages/KitchenDisplayPage/KitchenDisplayPage";
 import SettingsPage from "./pages/SettingsPage/SettingsPage";
 import BillingReportPage from "./pages/BillingReportPage/BillingReportPage";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
@@ -18,6 +20,11 @@ import CustomerManagementPage from "./pages/CustomerManagementPage/CustomerManag
 import CashDrawerPage from "./pages/CashDrawerPage/CashDrawerPage";
 import OrdersManagementPage from "./pages/OrdersManagementPage/OrdersManagementPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import CustomerPortalPage from "./pages/CustomerPortalPage/CustomerPortalPage";
+import QrCodesPage from "./pages/QrCodesPage/QrCodesPage";
+import PromotionsPage from "./pages/PromotionsPage/PromotionsPage";
+import AggregatorOrdersPage from "./pages/AggregatorOrdersPage/AggregatorOrdersPage";
+import KitchenAnalyticsPage from "./pages/KitchenAnalyticsPage/KitchenAnalyticsPage";
 import { getStoredAdmin, logoutAdmin } from "./services/authService";
 import { createAppTheme } from "./styles/theme";
 import "./styles/global.css";
@@ -28,6 +35,8 @@ const MENU_PATH = "/admin/menu";
 const INVENTORY_PATH = "/admin/inventory";
 const INVENTORY_PURCHASES_PATH = "/admin/inventory/purchases";
 const BILLING_PATH = "/admin/billing";
+const TABLE_ORDERS_PATH = "/admin/pos/table-view";
+const KITCHEN_PATH = "/admin/kitchen";
 const SETTINGS_PATH = "/admin/settings";
 const REPORTS_PATH = "/admin/reports";
 const NOTIFICATIONS_PATH = "/admin/notifications";
@@ -37,6 +46,10 @@ const CUSTOMERS_PATH = "/admin/customers";
 const CASH_DRAWER_PATH = "/admin/cash-drawer";
 const ORDERS_PATH = "/admin/orders";
 const PROFILE_PATH = "/admin/profile";
+const QR_CODES_PATH = "/admin/qr-codes";
+const PROMOTIONS_PATH = "/menu/promotions";
+const AGGREGATOR_ORDERS_PATH = "/admin/aggregator-orders";
+const KITCHEN_ANALYTICS_PATH = "/analytics/kitchen";
 const LOGIN_PATH = "/sfh/login";
 const THEME_STORAGE_KEY = "sfhAdminTheme";
 const NOTIFICATION_COUNT_STORAGE_KEY = "sfhUnreadNotificationCount";
@@ -54,10 +67,16 @@ function getInitialThemeMode() {
 }
 
 function getPageFromPath(pathname) {
+  if (pathname === PROMOTIONS_PATH) return "promotions";
+  if (pathname === QR_CODES_PATH) return "qr-codes";
+  if (pathname === AGGREGATOR_ORDERS_PATH) return "aggregator-orders";
+  if (pathname === KITCHEN_ANALYTICS_PATH) return "kitchen-analytics";
   if (pathname === MENU_PATH) return "menu";
   if (pathname === INVENTORY_PURCHASES_PATH) return "inventory-purchases";
   if (pathname === INVENTORY_PATH) return "inventory";
   if (pathname === BILLING_PATH) return "billing";
+  if (pathname === TABLE_ORDERS_PATH) return "table-orders";
+  if (pathname === KITCHEN_PATH) return "kitchen";
   if (pathname === SETTINGS_PATH) return "settings";
   if (pathname === REPORTS_PATH) return "reports";
   if (pathname === NOTIFICATIONS_PATH) return "notifications";
@@ -71,10 +90,16 @@ function getPageFromPath(pathname) {
 }
 
 function getPathForPage(page) {
+  if (page === "promotions") return PROMOTIONS_PATH;
+  if (page === "qr-codes") return QR_CODES_PATH;
+  if (page === "aggregator-orders") return AGGREGATOR_ORDERS_PATH;
+  if (page === "kitchen-analytics") return KITCHEN_ANALYTICS_PATH;
   if (page === "menu") return MENU_PATH;
   if (page === "inventory-purchases") return INVENTORY_PURCHASES_PATH;
   if (page === "inventory") return INVENTORY_PATH;
   if (page === "billing") return BILLING_PATH;
+  if (page === "table-orders") return TABLE_ORDERS_PATH;
+  if (page === "kitchen") return KITCHEN_PATH;
   if (page === "settings") return SETTINGS_PATH;
   if (page === "reports") return REPORTS_PATH;
   if (page === "notifications") return NOTIFICATIONS_PATH;
@@ -85,6 +110,17 @@ function getPathForPage(page) {
   if (page === "orders") return ORDERS_PATH;
   if (page === "profile") return PROFILE_PATH;
   return DASHBOARD_PATH;
+}
+
+function getAllowedPage(user, page) {
+  if (!user) return page;
+  if (
+    user?.role !== "admin"
+    && !["billing", "table-orders", "kitchen", "cash-drawer", "profile"].includes(page)
+  ) {
+    return "cash-drawer";
+  }
+  return page;
 }
 
 function App() {
@@ -105,9 +141,10 @@ function App() {
 
   useEffect(() => {
     const handleLocationChange = () => {
+      if (window.location.pathname.startsWith("/customer/")) return;
       const storedUser = getStoredAdmin();
       setUser(storedUser);
-      const currentPage = getPageFromPath(window.location.pathname);
+      const currentPage = getAllowedPage(storedUser, getPageFromPath(window.location.pathname));
       setActivePage(currentPage);
       const expectedPath = storedUser ? getPathForPage(currentPage) : LOGIN_PATH;
       if (window.location.pathname !== expectedPath) {
@@ -119,8 +156,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const authenticated = Boolean(getStoredAdmin());
-    const expectedPath = authenticated ? getPathForPage(activePage) : LOGIN_PATH;
+    if (window.location.pathname.startsWith("/customer/")) return;
+    const storedUser = getStoredAdmin();
+    const allowedPage = getAllowedPage(storedUser, activePage);
+    if (allowedPage !== activePage) setActivePage(allowedPage);
+    const expectedPath = storedUser ? getPathForPage(allowedPage) : LOGIN_PATH;
     if (window.location.pathname !== expectedPath) {
       window.history.replaceState({}, "", expectedPath);
     }
@@ -128,13 +168,14 @@ function App() {
 
   function handleLogin(adminUser) {
     setUser(adminUser);
-    setActivePage("dashboard");
-    window.history.pushState({}, "", DASHBOARD_PATH);
+    setActivePage("cash-drawer");
+    window.history.pushState({}, "", CASH_DRAWER_PATH);
   }
 
   function handleNavigate(page) {
-    setActivePage(page);
-    window.history.pushState({}, "", getPathForPage(page));
+    const allowedPage = getAllowedPage(user, page);
+    setActivePage(allowedPage);
+    window.history.pushState({}, "", getPathForPage(allowedPage));
   }
 
   function handleLogout() {
@@ -158,7 +199,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {user ? (
+      {window.location.pathname.startsWith("/customer/") ? (
+        <CustomerPortalPage />
+      ) : user ? (
         <AdminLayout
           user={user}
           activePage={activePage}
@@ -174,6 +217,10 @@ function App() {
             <InventoryPage key={activePage} initialTab={activePage === "inventory-purchases" ? "purchases" : "stock"} />
           ) : activePage === "billing" ? (
             <BillingPage />
+          ) : activePage === "table-orders" ? (
+            <TableOrderPage />
+          ) : activePage === "kitchen" ? (
+            <KitchenDisplayPage />
           ) : activePage === "settings" ? (
             <SettingsPage />
           ) : activePage === "reports" ? (
@@ -194,10 +241,18 @@ function App() {
             <CashDrawerPage />
           ) : activePage === "orders" ? (
             <OrdersManagementPage />
+          ) : activePage === "qr-codes" ? (
+            <QrCodesPage />
+          ) : activePage === "promotions" ? (
+            <PromotionsPage />
+          ) : activePage === "aggregator-orders" ? (
+            <AggregatorOrdersPage onNavigate={handleNavigate} />
+          ) : activePage === "kitchen-analytics" ? (
+            <KitchenAnalyticsPage />
           ) : activePage === "profile" ? (
             <ProfilePage user={user} onThemeChange={handleThemeChange} themeMode={themeMode} />
           ) : (
-            <DashboardPage user={user} />
+            <DashboardPage user={user} onNavigate={handleNavigate} />
           )}
         </AdminLayout>
       ) : (

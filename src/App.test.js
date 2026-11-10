@@ -34,22 +34,25 @@ test('renders the admin sign-in screen', () => {
   expect(screen.getByRole('button', { name: /^sign in$/i })).toBeDisabled();
 });
 
-test('admin login opens the dashboard with Dashboard active', async () => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    text: async () =>
-      JSON.stringify({
+test('admin login opens cash drawer controls before POS use', async () => {
+  global.fetch = jest.fn().mockImplementation(async (url) => {
+    const path = new URL(url).pathname;
+    return {
+      ok: true,
+      text: async () => JSON.stringify(path === '/api/auth/login' ? {
         success: true,
         message: 'Authentication successful.',
         token: 'test-token',
         data: {
+          id: '1',
           first_name: 'Test',
           last_name: 'Admin',
           email: 'admin@example.com',
           phone_number: '9000000000',
           role: 'Admin',
         },
-      }),
+      } : { success: true, drawers: [] }),
+    };
   });
   render(<App />);
   fireEvent.change(screen.getByLabelText(/email or mobile number/i), {
@@ -60,40 +63,47 @@ test('admin login opens the dashboard with Dashboard active', async () => {
   });
   fireEvent.click(screen.getByRole('button', { name: /^sign in$/i }));
 
-  expect(await screen.findByText(/good to see you, test/i)).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: /cash drawer & shift handover/i })).toBeInTheDocument();
   expect(global.fetch).toHaveBeenCalledWith(
     new URL('/api/auth/login', 'http://localhost:5050'),
     expect.objectContaining({
       body: JSON.stringify({ identifier: '9000000000', password: 'secret' }),
     })
   );
-  expect(screen.getByRole('button', { name: /dashboard/i })).toHaveClass('is-active');
-  expect(window.location.pathname).toBe('/admin/dashboard');
+  expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /cancel/i }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(screen.getByRole('button', { name: /daily opening cash/i })).toHaveClass('is-active');
+  expect(window.location.pathname).toBe('/admin/cash-drawer');
 });
 
-test('non-admin login is rejected', async () => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    text: async () =>
-      JSON.stringify({
+test('employee login opens the restricted cashier workspace', async () => {
+  global.fetch = jest.fn().mockImplementation(async (url) => {
+    const path = new URL(url).pathname;
+    return {
+      ok: true,
+      text: async () => JSON.stringify(path === '/api/auth/login' ? {
         success: true,
-        token: 'manager-token',
-        data: { first_name: 'Manager', role: 'Manager' },
-      }),
+        token: 'employee-token',
+        data: { id: '2', first_name: 'Cashier', role: 'Employee' },
+      } : { success: true, drawers: [] }),
+    };
   });
   render(<App />);
   fireEvent.change(screen.getByLabelText(/email or mobile number/i), {
-    target: { value: 'manager@example.com' },
+    target: { value: 'cashier@example.com' },
   });
   fireEvent.change(screen.getByLabelText(/^password$/i), {
     target: { value: 'secret' },
   });
   fireEvent.click(screen.getByRole('button', { name: /^sign in$/i }));
 
-  expect(
-    await screen.findByText(/does not have admin portal access/i)
-  ).toBeInTheDocument();
-  await waitFor(() => expect(window.location.pathname).toBe('/sfh/login'));
+  expect(await screen.findByRole('heading', { name: /cash drawer & shift handover/i })).toBeInTheDocument();
+  fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: /cancel/i }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(screen.getByRole('button', { name: /billing & pos/i })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /inventory & stock/i })).not.toBeInTheDocument();
+  expect(window.location.pathname).toBe('/admin/cash-drawer');
 });
 
 test('401 responses show one locked session dialog and login clears auth state', async () => {
@@ -120,7 +130,11 @@ test('401 responses show one locked session dialog and login clears auth state',
     ]);
   });
   expect(protectedRequests).toHaveLength(2);
-  expect(global.fetch).toHaveBeenCalledTimes(2);
+  const requestedPaths = global.fetch.mock.calls.map(([url]) => new URL(url).pathname);
+  expect(requestedPaths).toEqual(expect.arrayContaining([
+    '/api/protected',
+    '/api/another-protected-resource',
+  ]));
 
   const dialog = await screen.findByRole('dialog', { name: /session expired/i });
   expect(screen.getAllByRole('dialog', { name: /session expired/i })).toHaveLength(1);

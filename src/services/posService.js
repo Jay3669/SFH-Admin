@@ -17,3 +17,13 @@ export async function listRecentPosSales(limit = 5) {
   if (!Array.isArray(response?.sales) || response.success === false) throw new Error("The recent bills response was invalid.");
   return response.sales;
 }
+
+export async function setManagerPin(payload) {
+  const response = await apiRequest("/api/pos/discount-authorizations/pin", {
+    method: "POST",
+    skipGlobalError: true,
+    body: JSON.stringify(payload),
+  });
+  if (response?.success === false) throw new Error(response.message || "Unable to save the manager PIN.");
+  return response;
+}

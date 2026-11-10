@@ -800,7 +800,7 @@ export default function InventoryPage({ initialTab = "stock" }) {
     return <Box className="inventory-section-stack">
       <RecipeProductionPanel />
       {dishes.length > 0 && <>
-        <Alert severity="info" className="inventory-info-alert">Link ingredients to menu dishes. A completed POS bill checks all recipe stock atomically and deducts ingredients from the oldest batches first.</Alert>
+        <Alert severity="info" className="inventory-info-alert">Link ingredients to menu dishes. Fully paid POS bills queue recipe consumption in the background; stock is checked and deducted from the oldest batches first.</Alert>
         <Card className="inventory-panel" elevation={0}>
         <PanelHeading title="Menu recipes" subtitle={`${dishes.length} recipes · ${recipes.length} ingredient links`} action={<Button variant="contained" color="secondary" startIcon={<AddRoundedIcon />} onClick={() => { setRecipeToEdit(null); setRecipeForm(EMPTY_RECIPE); setFormError(""); setRecipeDialogOpen(true); }}>Add ingredient</Button>} />
         <Box className="inventory-recipe-grid">{dishes.map((dish) => {

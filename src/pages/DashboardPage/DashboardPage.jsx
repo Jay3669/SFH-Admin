@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Card,
+  CardActionArea,
   CardContent,
   Chip,
   CircularProgress,
@@ -16,12 +17,11 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import AccountBalanceWalletRoundedIcon from "@mui/icons-material/AccountBalanceWalletRounded";
-import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded";
-import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
-import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
+import LocalDiningRoundedIcon from "@mui/icons-material/LocalDiningRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
@@ -32,6 +32,7 @@ import { getInventory } from "../../services/inventoryService";
 import { getCustomers } from "../../services/customerManagement";
 import { getOrders } from "../../services/ordersManagement";
 import { listFinancialExpenses } from "../../services/financialExpenses";
+import { listDiningTables } from "../../services/kotService";
 import "./DashboardPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -110,25 +111,33 @@ function percentChange(current, previous) {
   return ((current - previous) / previous) * 100;
 }
 
-function StatCard({ label, value, comparison, icon: Icon, tone }) {
-  const positive = comparison >= 0;
+function StatCard({ label, value, comparison, detail, icon: Icon, tone, onClick }) {
+  const positive = comparison === null || comparison >= 0;
+  const changeTone = comparison === null ? "is-neutral" : positive ? "is-positive" : "is-negative";
   const TrendIcon = positive ? TrendingUpRoundedIcon : TrendingDownRoundedIcon;
+  const content = (
+    <CardContent>
+      <Box className="dashboard-stat__summary">
+        <Box><Typography className="dashboard-stat__label">{label}</Typography><Typography className="dashboard-stat__value">{value}</Typography></Box>
+        <Box className={`dashboard-stat__icon is-${tone}`}><Icon /></Box>
+      </Box>
+      <Typography className={`dashboard-stat__change ${changeTone}`}>
+        {comparison === null ? detail : <><TrendIcon /> {Math.abs(comparison).toFixed(1)}% vs previous period</>}
+      </Typography>
+    </CardContent>
+  );
   return (
-    <Card className="dashboard-stat" elevation={0}>
-      <CardContent>
-        <Box className="dashboard-stat__summary">
-          <Box><Typography className="dashboard-stat__label">{label}</Typography><Typography className="dashboard-stat__value">{value}</Typography></Box>
-          <Box className={`dashboard-stat__icon is-${tone}`}><Icon /></Box>
-        </Box>
-        <Typography className={`dashboard-stat__change ${positive ? "is-positive" : "is-negative"}`}>
-          <TrendIcon /> {Math.abs(comparison).toFixed(1)}% vs previous period
-        </Typography>
-      </CardContent>
-    </Card>
+    <Tooltip title={detail} describeChild>
+      <Card className="dashboard-stat" elevation={0}>
+        {onClick
+          ? <CardActionArea className="dashboard-stat__action" onClick={onClick} aria-label={`${label}: ${value}. ${detail}`}>{content}</CardActionArea>
+          : content}
+      </Card>
+    </Tooltip>
   );
 }
 
-export default function DashboardPage({ user }) {
+export default function DashboardPage({ user, onNavigate }) {
   const [range, setRange] = useState("today");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -140,6 +149,8 @@ export default function DashboardPage({ user }) {
   const [orders, setOrders] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [recent, setRecent] = useState([]);
+  const [tables, setTables] = useState([]);
+  const [tableLoadError, setTableLoadError] = useState("");
 
   async function load() {
     setLoading(true);
@@ -151,8 +162,9 @@ export default function DashboardPage({ user }) {
       Promise.resolve().then(getOrders),
       Promise.resolve().then(listFinancialExpenses),
       import("../../services/posService").then(({ listRecentPosSales }) => listRecentPosSales(8)),
+      listDiningTables(),
     ]);
-    const [reportResult, inventoryResult, customerResult, orderResult, expenseResult, recentResult] = results;
+    const [reportResult, inventoryResult, customerResult, orderResult, expenseResult, recentResult, tableResult] = results;
     if (reportResult.status === "rejected") setError(reportResult.reason?.message || "Dashboard analytics could not be loaded.");
     else setReport(reportResult.value);
     if (inventoryResult.status === "fulfilled") setInventory(inventoryResult.value);
@@ -160,6 +172,12 @@ export default function DashboardPage({ user }) {
     if (orderResult.status === "fulfilled") setOrders(orderResult.value);
     if (expenseResult.status === "fulfilled") setExpenses(expenseResult.value);
     if (recentResult.status === "fulfilled") setRecent(recentResult.value);
+    if (tableResult.status === "fulfilled") {
+      setTables(tableResult.value);
+      setTableLoadError("");
+    } else {
+      setTableLoadError(tableResult.reason?.message || "Active table count could not be loaded.");
+    }
     setLoading(false);
   }
 
@@ -188,6 +206,11 @@ export default function DashboardPage({ user }) {
       return date >= currentRange.start && date <= currentRange.end;
     });
     const expenseTotal = periodExpenses.reduce((sum, expense) => sum + amount(expense.amount), 0);
+    const previousExpenses = expenses.filter((expense) => {
+      const date = new Date(expense.date);
+      return date >= previous.start && date <= previous.end;
+    });
+    const previousExpenseTotal = previousExpenses.reduce((sum, expense) => sum + amount(expense.amount), 0);
     const stockValue = (inventory.items || []).reduce((sum, item) => sum + amount(item.quantity) * amount(item.cost ?? item.unitCost ?? item.averageCost), 0);
     const lowStock = (inventory.items || []).filter((item) => amount(item.quantity) > 0 && amount(item.quantity) <= amount(item.reorderLevel));
     const outOfStock = (inventory.items || []).filter((item) => amount(item.quantity) <= 0);
@@ -208,21 +231,19 @@ export default function DashboardPage({ user }) {
       const date = new Date(order.placedAt);
       return date >= currentRange.start && date <= currentRange.end;
     });
-    return { currentRange, sales, salesTotal, priorTotal, payments, expenseTotal, stockValue, lowStock, outOfStock, topItems, chart, max, periodOrders };
+    return { currentRange, sales, priorSales, salesTotal, priorTotal, payments, expenseTotal, previousExpenseTotal, stockValue, lowStock, outOfStock, topItems, chart, max, periodOrders };
   }, [range, customFrom, customTo, report, inventory, orders, expenses]);
 
-  const priorExpense = expenses.reduce((sum, expense) => sum + amount(expense.amount), 0) / Math.max(expenses.length ? 30 : 1, 1);
+  const averageOrderValue = view.sales.length ? view.salesTotal / view.sales.length : 0;
+  const priorAverageOrderValue = view.priorSales.length ? view.priorTotal / view.priorSales.length : 0;
+  const activeTableCount = tables.filter((table) => ["occupied", "billed"].includes(table.status)).length;
   const stats = [
-    ["Today's total sales", CURRENCY.format(view.salesTotal), percentChange(view.salesTotal, view.priorTotal), AccountBalanceWalletRoundedIcon, "gold"],
-    ["Today's orders", String(view.sales.length), percentChange(view.sales.length, view.periodOrders.length), ReceiptLongRoundedIcon, "orange"],
-    ["Total customers", String(customers.length), 0, PeopleRoundedIcon, "navy"],
-    ["Today's profit", CURRENCY.format(view.salesTotal - view.expenseTotal), percentChange(view.salesTotal - view.expenseTotal, priorExpense), TrendingUpRoundedIcon, "green"],
-    ["Today's expenses", CURRENCY.format(view.expenseTotal), 0, WalletRoundedIcon, "orange"],
-    ["Pending payments", CURRENCY.format(view.payments.pending), 0, ShoppingBagRoundedIcon, "navy"],
-    ["Cash collection", CURRENCY.format(view.payments.cash), 0, AccountBalanceWalletRoundedIcon, "green"],
-    ["UPI collection", CURRENCY.format(view.payments.upi), 0, CreditCardRoundedIcon, "gold"],
-    ["Card collection", CURRENCY.format(view.payments.card), 0, CreditCardRoundedIcon, "orange"],
-    ["Available stock value", CURRENCY.format(view.stockValue), 0, Inventory2RoundedIcon, "navy"],
+    { label: "Sales this period", value: CURRENCY.format(view.salesTotal), comparison: percentChange(view.salesTotal, view.priorTotal), detail: `${view.sales.length} bills · click to open the sales report.`, icon: AccountBalanceWalletRoundedIcon, tone: "gold", destination: "reports" },
+    { label: "Orders this period", value: String(view.sales.length), comparison: percentChange(view.sales.length, view.priorSales.length), detail: `${view.sales.length} completed POS bills in the selected period.`, icon: ReceiptLongRoundedIcon, tone: "orange", destination: "reports" },
+    { label: "Average order value", value: CURRENCY.format(averageOrderValue), comparison: percentChange(averageOrderValue, priorAverageOrderValue), detail: `${view.sales.length} bills · ${CURRENCY.format(view.salesTotal)} total.`, icon: ShoppingBagRoundedIcon, tone: "navy", destination: "reports" },
+    { label: "Active tables", value: tableLoadError ? "—" : String(activeTableCount), comparison: null, detail: tableLoadError || "Occupied and billed tables · click to open table orders.", icon: LocalDiningRoundedIcon, tone: "orange", destination: "table-orders" },
+    { label: "Net after expenses", value: CURRENCY.format(view.salesTotal - view.expenseTotal), comparison: percentChange(view.salesTotal - view.expenseTotal, view.priorTotal - view.previousExpenseTotal), detail: `${CURRENCY.format(view.salesTotal)} sales less ${CURRENCY.format(view.expenseTotal)} expenses.`, icon: TrendingUpRoundedIcon, tone: "green", destination: "financial-health" },
+    { label: "Pending payments", value: CURRENCY.format(view.payments.pending), comparison: null, detail: "Balances still due on sales in the selected period.", icon: WalletRoundedIcon, tone: "navy", destination: "reports" },
   ];
   const paymentMax = Math.max(view.payments.cash, view.payments.upi, view.payments.card, 1);
   const orderTypes = view.periodOrders.reduce((result, order) => {
@@ -245,8 +266,14 @@ export default function DashboardPage({ user }) {
 
       {loading && <Box className="dashboard-state"><CircularProgress size={32} /><Typography>Loading analytics…</Typography></Box>}
       {!loading && error && <Alert severity="error" action={<Chip label="Retry" onClick={load} />}>{error}</Alert>}
+      {!loading && tableLoadError && <Alert severity="warning">{tableLoadError}</Alert>}
 
-      {!loading && <><Box className="dashboard-stats">{stats.map(([label, value, comparison, icon, tone]) => <StatCard key={label} label={label} value={value} comparison={comparison} icon={icon} tone={tone} />)}</Box>
+      {!loading && <><Box className="dashboard-stats">{stats.map((stat) => <StatCard key={stat.label} {...stat} onClick={() => onNavigate?.(stat.destination)} />)}</Box>
+        <Box className="dashboard-operational-snapshot" aria-label="Operational highlights">
+          {[["Customers", String(customers.length)], ["Expenses", CURRENCY.format(view.expenseTotal)], ["Cash", CURRENCY.format(view.payments.cash)], ["UPI", CURRENCY.format(view.payments.upi)], ["Card", CURRENCY.format(view.payments.card)], ["Stock value", CURRENCY.format(view.stockValue)]].map(([label, value]) => (
+            <Box key={label}><Typography>{label}</Typography><strong>{value}</strong></Box>
+          ))}
+        </Box>
         <Box className="dashboard-analytics-grid">
           <Card className="dashboard-chart-card" elevation={0}><CardContent><Box className="dashboard-chart-card__heading"><Box><Typography component="h2">Sales trend</Typography><Typography>Revenue within the selected period</Typography></Box><TrendingUpRoundedIcon /></Box>
             {view.chart.length ? <Box className="dashboard-bar-chart">{view.chart.map(([date, value]) => <Box className="dashboard-bar-chart__item" key={date}><span>{CURRENCY.format(value)}</span><Box className="dashboard-bar-chart__bar" style={{ height: `${Math.max(8, value / view.max * 100)}%` }} /><Typography>{new Date(`${date}T12:00:00`).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</Typography></Box>)}</Box> : <Box className="dashboard-no-data">No sales recorded for this period.</Box>}
