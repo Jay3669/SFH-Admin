@@ -20,6 +20,7 @@ import {
   submitPublicFeedback,
   submitPublicOrder,
 } from "../../services/featureServices";
+import { formatDateTime } from "../../utils/dateTimeFormat";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
 
@@ -175,7 +176,7 @@ function PublicReceipt({ token, feedback = false }) {
       <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
         <Typography variant="overline" color="primary">SURYA FOOD HUB</Typography>
         <Typography component="h1" variant="h4" fontWeight={800}>{feedback ? "How was your visit?" : "Your receipt"}</Typography>
-        {!feedback && <Typography color="text.secondary">{receipt.number} · {new Date(receipt.date).toLocaleString("en-IN")}</Typography>}
+        {!feedback && <Typography color="text.secondary">{receipt.number} · {formatDateTime(receipt.date)}</Typography>}
         {!feedback && <>
           <Divider sx={{ my: 2 }} />
           {receipt.items.map((item, index) => <Box key={`${item.name}-${index}`} sx={{ display: "flex", justifyContent: "space-between", py: 0.75 }}><span>{item.quantity} × {item.name}</span><strong>{CURRENCY.format(item.lineTotal)}</strong></Box>)}

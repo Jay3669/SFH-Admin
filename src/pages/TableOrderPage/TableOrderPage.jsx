@@ -36,6 +36,7 @@ import {
   connectKitchenSocket,
 } from "../../services/kotService";
 import "./TableOrderPage.css";
+import { formatDateTime } from "../../utils/dateTimeFormat";
 
 const STATIONS = ["Tandoor", "Curry", "Starters", "Beverages"];
 const CURRENCY = new Intl.NumberFormat("en-IN", {
@@ -737,7 +738,7 @@ export default function TableOrderPage() {
               <Box key={kot.id} sx={{ mb: 3, pb: 2, borderBottom: "1px dashed #555" }}>
                 <Typography variant="h5" fontWeight={800}>{kot.number}</Typography>
                 <Typography variant="h6">{kot.station} · Table {kot.tableName}</Typography>
-                <Typography variant="caption">{new Date(kot.createdAt).toLocaleString("en-IN")}</Typography>
+                <Typography variant="caption">{formatDateTime(kot.createdAt)}</Typography>
                 {kot.items.map((item) => (
                   <Box key={item.id} sx={{ display: "flex", justifyContent: "space-between", gap: 2, mt: 1 }}>
                     <Typography>{item.name}{item.notes ? ` (${item.notes})` : ""}</Typography>

@@ -33,6 +33,7 @@ import {
   handoverCashDrawer,
   openCashDrawer,
 } from "../../services/cashDrawer";
+import { formatDate as formatConfiguredDate, formatTime } from "../../utils/dateTimeFormat";
 import "./CashDrawerPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", {
@@ -55,13 +56,7 @@ function localDate() {
 
 function formatDate(value) {
   if (!value) return "—";
-  const date = new Date(`${value}T12:00:00.000Z`);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "Asia/Kolkata",
-  });
+  return formatConfiguredDate(value);
 }
 
 function movementTotals(movements = []) {
@@ -352,7 +347,7 @@ export default function CashDrawerPage() {
           {session && (
             <>
               <Box className="cash-drawer__stats">
-                <StatCard icon={SavingsOutlinedIcon} label="Opening cash" value={CURRENCY.format(session.openingAmount)} detail={`Started ${new Date(session.openedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`} tone="opening" />
+                <StatCard icon={SavingsOutlinedIcon} label="Opening cash" value={CURRENCY.format(session.openingAmount)} detail={`Started ${formatTime(session.openedAt)}`} tone="opening" />
                 <StatCard icon={PointOfSaleRoundedIcon} label="Cash sales" value={CURRENCY.format(session.cashSales)} detail="This cashier · sales less change" tone="sales" />
                 <StatCard icon={ArrowDownwardRoundedIcon} label="Cash added" value={CURRENCY.format(totals.in)} detail={`${session.movements.filter((entry) => entry.direction === "in").length} cash-in entries`} tone="in" />
                 <StatCard icon={PaymentsOutlinedIcon} label={isClosed ? "Expected at close" : "Expected in drawer"} value={CURRENCY.format(isClosed ? session.expectedAtClose : expected)} detail={`Cash out ${CURRENCY.format(totals.out)}`} tone="expected" />
@@ -360,7 +355,7 @@ export default function CashDrawerPage() {
 
               {isClosed ? (
                 <Card className="cash-drawer__closed-card" elevation={0}>
-                  <Box className="cash-drawer__closed-heading"><Box className="cash-drawer__closed-icon"><LockClockOutlinedIcon /></Box><Box><Typography component="h2">Shift closed</Typography><Typography>Closed {new Date(session.closedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} · {formatDate(session.date)}</Typography></Box></Box>
+                  <Box className="cash-drawer__closed-heading"><Box className="cash-drawer__closed-icon"><LockClockOutlinedIcon /></Box><Box><Typography component="h2">Shift closed</Typography><Typography>Closed {formatTime(session.closedAt)} · {formatDate(session.date)}</Typography></Box></Box>
                   <Box className="cash-drawer__reconciliation">
                     <Box><span>Expected cash</span><strong>{CURRENCY.format(session.expectedAtClose)}</strong></Box>
                     <Box><span>Physical count</span><strong>{CURRENCY.format(session.closingCount)}</strong></Box>
@@ -393,10 +388,10 @@ export default function CashDrawerPage() {
               <Card className="cash-drawer__activity" elevation={0}>
                 <Box className="cash-drawer__section-heading"><Box><Typography component="h2">Cash drawer activity</Typography><Typography>Opening float, cashier-specific cash sales, and audited manual movements.</Typography></Box></Box>
                 <Box className="cash-drawer__activity-list">
-                  <Box className="cash-drawer__activity-row"><Box className="cash-drawer__activity-icon is-opening"><LockOpenRoundedIcon /></Box><Box><strong>Opening cash</strong><span>{session.cashierName} · {new Date(session.openedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span></Box><strong>{CURRENCY.format(session.openingAmount)}</strong></Box>
+                  <Box className="cash-drawer__activity-row"><Box className="cash-drawer__activity-icon is-opening"><LockOpenRoundedIcon /></Box><Box><strong>Opening cash</strong><span>{session.cashierName} · {formatTime(session.openedAt)}</span></Box><strong>{CURRENCY.format(session.openingAmount)}</strong></Box>
                   <Box className="cash-drawer__activity-row"><Box className="cash-drawer__activity-icon is-sales"><PointOfSaleRoundedIcon /></Box><Box><strong>Cash sales{isClosed ? " (at close)" : ""}</strong><span>This cashier · {formatDate(cashDate)}</span></Box><strong>+ {CURRENCY.format(session.cashSales)}</strong></Box>
-                  {session.movements.map((movement) => <Box className="cash-drawer__activity-row" key={movement.id}><Box className={`cash-drawer__activity-icon is-${movement.direction}`}>{movement.direction === "in" ? <ArrowDownwardRoundedIcon /> : <ArrowUpwardRoundedIcon />}</Box><Box><strong>{movement.description}</strong><span>{movement.direction === "in" ? "Cash added" : "Cash paid out"} · {new Date(movement.at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span></Box><strong className={movement.direction === "in" ? "is-in" : "is-out"}>{movement.direction === "in" ? "+" : "−"} {CURRENCY.format(movement.amount)}</strong></Box>)}
-                  {session.logs?.filter((log) => ["handed_over", "handover_received"].includes(log.event)).map((log) => <Box className="cash-drawer__activity-row" key={log.id}><Box className="cash-drawer__activity-icon"><LockClockOutlinedIcon /></Box><Box><strong>{log.event === "handed_over" ? "Shift handed over" : "Shift handover received"}</strong><span>{log.description} · {new Date(log.at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span></Box><strong>{CURRENCY.format(log.amount || 0)}</strong></Box>)}
+                  {session.movements.map((movement) => <Box className="cash-drawer__activity-row" key={movement.id}><Box className={`cash-drawer__activity-icon is-${movement.direction}`}>{movement.direction === "in" ? <ArrowDownwardRoundedIcon /> : <ArrowUpwardRoundedIcon />}</Box><Box><strong>{movement.description}</strong><span>{movement.direction === "in" ? "Cash added" : "Cash paid out"} · {formatTime(movement.at)}</span></Box><strong className={movement.direction === "in" ? "is-in" : "is-out"}>{movement.direction === "in" ? "+" : "−"} {CURRENCY.format(movement.amount)}</strong></Box>)}
+                  {session.logs?.filter((log) => ["handed_over", "handover_received"].includes(log.event)).map((log) => <Box className="cash-drawer__activity-row" key={log.id}><Box className="cash-drawer__activity-icon"><LockClockOutlinedIcon /></Box><Box><strong>{log.event === "handed_over" ? "Shift handed over" : "Shift handover received"}</strong><span>{log.description} · {formatTime(log.at)}</span></Box><strong>{CURRENCY.format(log.amount || 0)}</strong></Box>)}
                   {isClosed && <Box className="cash-drawer__activity-row"><Box className="cash-drawer__activity-icon is-taken"><ArrowUpwardRoundedIcon /></Box><Box><strong>Cash taken out / deposit</strong><span>Recorded at close</span></Box><strong className="is-out">− {CURRENCY.format(session.cashTaken)}</strong></Box>}
                 </Box>
               </Card>

@@ -52,6 +52,7 @@ export default function AdminLayout({
   themeMode = "light",
   onThemeChange,
   notificationUnreadCount = 0,
+  dateTimeSettingsVersion = 0,
   children,
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -375,7 +376,7 @@ export default function AdminLayout({
   );
 
   return (
-    <Box className="admin-shell">
+    <Box className="admin-shell" data-date-time-settings-version={dateTimeSettingsVersion}>
       <ConfirmationDialog
         open={logoutConfirmOpen}
         title="Sign out of your account?"
@@ -520,7 +521,13 @@ export default function AdminLayout({
               >
                 {themeMode === "dark" ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />}
               </IconButton>
-              <Box className="admin-header__account">
+              <Box
+                component="button"
+                type="button"
+                className="admin-header__account"
+                aria-label="Open profile"
+                onClick={() => onNavigate("profile")}
+              >
                 <Avatar className="admin-header__avatar">
                   {(user?.name || "A").charAt(0).toUpperCase()}
                 </Avatar>

@@ -1563,40 +1563,6 @@
   }
 }
 
-.menu-item-grid {
-  grid-template-columns: minmax(0, 1fr) !important;
-}
-
-.menu-item-card.MuiCard-root {
-  display: grid;
-  grid-template-columns: minmax(150px, 250px) minmax(0, 1fr);
-  align-items: stretch;
-}
-
-.menu-item-card__image {
-  min-height: 150px !important;
-  aspect-ratio: auto;
-}
-
-.menu-item-card__image-price.MuiButton-root {
-  min-height: 40px;
-  padding: 0.38rem 0.58rem;
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 0.65rem;
-  background: rgb(255 255 255 / 17%);
-  color: #fff;
-  font-size: 0.88rem;
-  font-weight: 800;
-  text-transform: none;
-  white-space: nowrap;
-}
-
-@media (max-width: 560px) {
-  .menu-item-card.MuiCard-root {
-    grid-template-columns: 120px minmax(0, 1fr);
-  }
-}
-
 .menu-item-card.is-out-of-stock .menu-item-card__image {
   opacity: 0.58;
   filter: grayscale(0.75);

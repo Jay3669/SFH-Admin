@@ -26,7 +26,9 @@ import PromotionsPage from "./pages/PromotionsPage/PromotionsPage";
 import AggregatorOrdersPage from "./pages/AggregatorOrdersPage/AggregatorOrdersPage";
 import KitchenAnalyticsPage from "./pages/KitchenAnalyticsPage/KitchenAnalyticsPage";
 import { getStoredAdmin, logoutAdmin } from "./services/authService";
+import { loadPosSettings, POS_SETTINGS_UPDATED_EVENT } from "./services/posSettings";
 import { notifyApiError } from "./utils/apiErrorStore";
+import { isSessionInvalidated } from "./utils/sessionExpiryStore";
 import { createAppTheme } from "./styles/theme";
 import "./styles/global.css";
 import "./styles/responsive.css";
@@ -126,6 +128,7 @@ function getAllowedPage(user, page) {
 
 function App() {
   const [user, setUser] = useState(getStoredAdmin);
+  const [dateTimeSettingsVersion, setDateTimeSettingsVersion] = useState(0);
   const [notificationUnreadCount, setNotificationUnreadCount] = useState(getInitialNotificationCount);
   const [themeMode, setThemeMode] = useState(() => {
     const initialMode = getInitialThemeMode();
@@ -136,6 +139,19 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute("data-admin-theme", themeMode);
   }, [themeMode]);
+  useEffect(() => {
+    const refreshDateTimeSettings = () => setDateTimeSettingsVersion((version) => version + 1);
+    window.addEventListener(POS_SETTINGS_UPDATED_EVENT, refreshDateTimeSettings);
+    return () => window.removeEventListener(POS_SETTINGS_UPDATED_EVENT, refreshDateTimeSettings);
+  }, []);
+  useEffect(() => {
+    if (!user || window.location.pathname.startsWith("/customer/")) return undefined;
+    let active = true;
+    loadPosSettings().catch((error) => {
+      if (active && !isSessionInvalidated()) notifyApiError(error.message || "Unable to load POS settings.");
+    });
+    return () => { active = false; };
+  }, [user]);
   const [activePage, setActivePage] = useState(() =>
     getPageFromPath(window.location.pathname)
   );
@@ -211,6 +227,7 @@ function App() {
           themeMode={themeMode}
           onThemeChange={handleThemeChange}
           notificationUnreadCount={notificationUnreadCount}
+          dateTimeSettingsVersion={dateTimeSettingsVersion}
         >
           {activePage === "menu" ? (
             <MenuManagementPage />

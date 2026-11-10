@@ -37,6 +37,7 @@ import {
 import { saveMonthlyBillReserve } from "../../services/monthlyBillReserve";
 import { summarizeProfitLoss } from "../../services/profitLossSummary";
 import MonthlyBillsReserve from "./MonthlyBillsReserve";
+import { formatDate, formatMonthYear } from "../../utils/dateTimeFormat";
 import "./FinancialHealthPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", {
@@ -66,22 +67,12 @@ function dateOnly(value) {
 
 function formatReportDate(value) {
   if (!value) return "Date not provided";
-  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00.000Z` : value);
-  return Number.isNaN(date.getTime())
-    ? String(value)
-    : date.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: "Asia/Kolkata",
-    });
+  return formatDate(value, undefined, { timeZone: "Asia/Kolkata" });
 }
 
 function formatMonthForExpense(value) {
   const date = new Date(`${value}-01T12:00:00`);
-  return Number.isNaN(date.getTime())
-    ? value
-    : date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  return Number.isNaN(date.getTime()) ? value : formatMonthYear(date);
 }
 
 function pdfDateRange(report) {

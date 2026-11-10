@@ -191,7 +191,7 @@ test("downloads a full statement PDF including tax, expenses, and the final resu
   expect(mockPdf.save).toHaveBeenCalledWith("sfh-profit-loss-monthly-2026-11-07.pdf");
   expect(mockPdf.text).toHaveBeenCalledWith("Taxes collected (excluded from revenue)", expect.any(Number), expect.any(Number));
   expect(mockPdf.text).toHaveBeenCalledWith("Staff & salaries", expect.any(Number), expect.any(Number));
-  expect(mockPdf.text).toHaveBeenCalledWith("November wages | Staff & salaries | 06 Nov 2026", expect.any(Number), expect.any(Number));
+  expect(mockPdf.text).toHaveBeenCalledWith("November wages | Staff & salaries | 06/11/2026", expect.any(Number), expect.any(Number));
   expect(await screen.findByText(/profit & loss pdf has been downloaded/i)).toBeInTheDocument();
 });
 

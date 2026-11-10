@@ -11,6 +11,8 @@ jest.mock("../../services/posSettings", () => ({
     taxRate: 0,
     paymentMethods: { cash: true, card: true, upi: true, split: false },
     allowBalanceDue: false,
+    dateFormat: "DD/MM/YYYY",
+    timeFormat: "12-hour",
   },
   getPosSettings: jest.fn(),
   loadPosSettings: jest.fn(),
@@ -50,6 +52,39 @@ test("saves packaging, tax, payment methods, and balance settings for POS", asyn
     taxRate: "5",
     paymentMethods: expect.objectContaining({ split: true }),
     allowBalanceDue: true,
+  }));
+});
+
+test("saves date and time display preferences to shared POS settings", async () => {
+  render(<SettingsPage />);
+
+  await screen.findByText("Loading saved POS settings…");
+  fireEvent.click(screen.getByRole("button", { name: /date & time/i }));
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: /date format/i }));
+  fireEvent.click(await screen.findByRole("option", { name: "Year-Month-Day (2026-11-09)" }));
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: /time format/i }));
+  fireEvent.click(await screen.findByRole("option", { name: /24-hour/i }));
+  fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+  expect(await screen.findByText(/settings saved and applied/i)).toBeInTheDocument();
+  expect(posSettings.updatePosSettings).toHaveBeenCalledWith(expect.objectContaining({
+    dateFormat: "YYYY-MM-DD",
+    timeFormat: "24-hour",
+  }));
+});
+
+test("saves a named-month date format to shared POS settings", async () => {
+  render(<SettingsPage />);
+
+  await screen.findByText("Loading saved POS settings…");
+  fireEvent.click(screen.getByRole("button", { name: /date & time/i }));
+  fireEvent.mouseDown(screen.getByRole("combobox", { name: /date format/i }));
+  fireEvent.click(await screen.findByRole("option", { name: "11 Nov 2026" }));
+  fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+  expect(await screen.findByText(/settings saved and applied/i)).toBeInTheDocument();
+  expect(posSettings.updatePosSettings).toHaveBeenCalledWith(expect.objectContaining({
+    dateFormat: "DD MMM YYYY",
   }));
 });
 

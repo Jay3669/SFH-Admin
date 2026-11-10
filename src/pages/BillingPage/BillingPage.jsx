@@ -39,6 +39,7 @@ import { createPosSale, listRecentPosSales, setManagerPin } from "../../services
 import { getStoredAdmin } from "../../services/authService";
 import { connectKitchenSocket } from "../../services/kotService";
 import { listActivePromotions, resendWhatsAppBill } from "../../services/featureServices";
+import { formatDate } from "../../utils/dateTimeFormat";
 import "./BillingPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", {
@@ -763,7 +764,7 @@ export default function BillingPage() {
         </Box>
 
         <Card className="billing-ticket" elevation={0}>
-          <Box className="billing-ticket__heading"><Box><Typography component="h2">Current bill</Typography><Typography>{new Date().toLocaleDateString("en-IN", { dateStyle: "medium" })}</Typography></Box><Chip label={`${cart.length} lines`} size="small" /></Box>
+          <Box className="billing-ticket__heading"><Box><Typography component="h2">Current bill</Typography><Typography>{formatDate(new Date())}</Typography></Box><Chip label={`${cart.length} lines`} size="small" /></Box>
           {cart.length ? <Box className="billing-ticket__lines">
             {cart.map((row) => (
               <Box

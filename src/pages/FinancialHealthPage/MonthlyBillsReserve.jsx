@@ -20,6 +20,7 @@ import {
   saveMonthlyBillReserve,
 } from "../../services/monthlyBillReserve";
 import "./MonthlyBillsReserve.css";
+import { formatDate as formatConfiguredDate, formatMonthYear } from "../../utils/dateTimeFormat";
 
 const MONEY = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -47,16 +48,11 @@ function nextMonth() {
 function formatMonth(month) {
   if (!month) return month;
   const date = new Date(`${month}-01T12:00:00`);
-  return Number.isNaN(date.getTime()) ? month : date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  return Number.isNaN(date.getTime()) ? month : formatMonthYear(date);
 }
 
 function formatDate(value) {
-  const date = new Date(`${value}T12:00:00`);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return formatConfiguredDate(value);
 }
 
 function makeId() {

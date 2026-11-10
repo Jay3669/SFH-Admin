@@ -29,6 +29,7 @@ import { getBillingReport } from "../../services/billingReport";
 import { closeCashDrawer, getCashDrawerSessions } from "../../services/cashDrawer";
 import { recordPurchasePayment, receivePurchase } from "../../services/inventoryService";
 import { voidPosSale } from "../../services/posService";
+import { formatDate, formatDateTime } from "../../utils/dateTimeFormat";
 import "./BillingReportPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" });
@@ -53,17 +54,9 @@ const EMPTY_BILLS = [];
 
 function displayDate(value) {
   if (!value) return "—";
-  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00.000Z` : value);
-  return Number.isNaN(date.getTime())
-    ? value
-    : date.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Asia/Kolkata",
-    });
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? formatDate(value, undefined, { timeZone: "Asia/Kolkata" })
+    : formatDateTime(value, undefined, { timeZone: "Asia/Kolkata" });
 }
 
 function purchasePaymentStatus(purchase) {

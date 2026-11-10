@@ -16,7 +16,11 @@ export const DEFAULT_POS_SETTINGS = {
     split: false,
   },
   allowBalanceDue: false,
+  dateFormat: "DD/MM/YYYY",
+  timeFormat: "12-hour",
 };
+
+export const POS_SETTINGS_UPDATED_EVENT = "sfh-pos-settings-updated";
 
 export function getPosSettings() {
   try {
@@ -44,6 +48,7 @@ export function savePosSettings(settings) {
     },
   };
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedSettings));
+  window.dispatchEvent(new Event(POS_SETTINGS_UPDATED_EVENT));
   return normalizedSettings;
 }
 

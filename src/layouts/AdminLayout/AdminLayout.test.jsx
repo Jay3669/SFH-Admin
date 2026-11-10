@@ -90,6 +90,27 @@ test("Notifications sidebar item and header bell open the inbox", () => {
   expect(onNavigate).toHaveBeenLastCalledWith("notifications");
 });
 
+test("Toolbar account opens the profile", () => {
+  const onNavigate = jest.fn();
+
+  render(
+    <ThemeProvider theme={theme}>
+      <AdminLayout
+        user={{ name: "Test Admin" }}
+        activePage="dashboard"
+        onNavigate={onNavigate}
+        onLogout={jest.fn()}
+      >
+        <div>Dashboard content</div>
+      </AdminLayout>
+    </ThemeProvider>
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /open profile/i }));
+
+  expect(onNavigate).toHaveBeenCalledWith("profile");
+});
+
 test("Financial health sidebar item opens the Profit & Loss report", () => {
   const onNavigate = jest.fn();
 

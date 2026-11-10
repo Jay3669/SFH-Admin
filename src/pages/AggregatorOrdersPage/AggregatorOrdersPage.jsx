@@ -21,6 +21,7 @@ import {
 } from "../../services/featureServices";
 import { listDiningTables, listKitchenKots } from "../../services/kotService";
 import { listRecentPosSales } from "../../services/posService";
+import { formatTime } from "../../utils/dateTimeFormat";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
 
@@ -146,7 +147,7 @@ export default function AggregatorOrdersPage({ onNavigate }) {
             <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 1 }}>
               <Box>
                 <Typography variant="h6" fontWeight={800}>{order.provider} · {order.external_order_id}</Typography>
-                <Typography color="text.secondary">{order.customer_name || "Customer"}{order.customer_phone ? ` · ${order.customer_phone}` : ""} · {new Date(order.createdAt).toLocaleTimeString("en-IN")}</Typography>
+                <Typography color="text.secondary">{order.customer_name || "Customer"}{order.customer_phone ? ` · ${order.customer_phone}` : ""} · {formatTime(order.createdAt)}</Typography>
               </Box>
               <Chip color={statusColor} label={order.status} />
             </Box>

@@ -33,6 +33,7 @@ import { getCustomers } from "../../services/customerManagement";
 import { getOrders } from "../../services/ordersManagement";
 import { listFinancialExpenses } from "../../services/financialExpenses";
 import { listDiningTables } from "../../services/kotService";
+import { formatDate } from "../../utils/dateTimeFormat";
 import "./DashboardPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -276,7 +277,7 @@ export default function DashboardPage({ user, onNavigate }) {
         </Box>
         <Box className="dashboard-analytics-grid">
           <Card className="dashboard-chart-card" elevation={0}><CardContent><Box className="dashboard-chart-card__heading"><Box><Typography component="h2">Sales trend</Typography><Typography>Revenue within the selected period</Typography></Box><TrendingUpRoundedIcon /></Box>
-            {view.chart.length ? <Box className="dashboard-bar-chart">{view.chart.map(([date, value]) => <Box className="dashboard-bar-chart__item" key={date}><span>{CURRENCY.format(value)}</span><Box className="dashboard-bar-chart__bar" style={{ height: `${Math.max(8, value / view.max * 100)}%` }} /><Typography>{new Date(`${date}T12:00:00`).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</Typography></Box>)}</Box> : <Box className="dashboard-no-data">No sales recorded for this period.</Box>}
+            {view.chart.length ? <Box className="dashboard-bar-chart">{view.chart.map(([date, value]) => <Box className="dashboard-bar-chart__item" key={date}><span>{CURRENCY.format(value)}</span><Box className="dashboard-bar-chart__bar" style={{ height: `${Math.max(8, value / view.max * 100)}%` }} /><Typography>{formatDate(date)}</Typography></Box>)}</Box> : <Box className="dashboard-no-data">No sales recorded for this period.</Box>}
           </CardContent></Card>
           <Card className="dashboard-chart-card" elevation={0}><CardContent><Typography component="h2">Payment collection</Typography><Typography className="dashboard-chart-card__subtitle">Cash, UPI and card totals</Typography>
             <Box className="dashboard-payment-bars">{[["Cash", view.payments.cash, "cash"], ["UPI", view.payments.upi, "upi"], ["Card", view.payments.card, "card"]].map(([label, value, tone]) => <Box key={label}><Box><Typography>{label}</Typography><strong>{CURRENCY.format(value)}</strong></Box><Box className="dashboard-payment-track"><span className={`is-${tone}`} style={{ width: `${value / paymentMax * 100}%` }} /></Box></Box>)}</Box>

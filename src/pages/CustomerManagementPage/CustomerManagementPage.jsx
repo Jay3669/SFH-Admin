@@ -28,6 +28,7 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import { getCustomers, saveCustomers } from "../../services/customerManagement";
+import { formatDate as formatConfiguredDate } from "../../utils/dateTimeFormat";
 import "./CustomerManagementPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" });
@@ -36,8 +37,7 @@ const EMPTY_DRAFT = { name: "", phone: "", email: "", birthday: "", notes: "" };
 
 function displayDate(value) {
   if (!value) return "Not recorded";
-  const date = new Date(`${value}T12:00:00.000Z`);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+  return formatConfiguredDate(value);
 }
 
 function StatCard({ icon: Icon, label, value, detail, tone }) {

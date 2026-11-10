@@ -5,13 +5,18 @@ import {
   ButtonBase,
   Button,
   Chip,
+  FormControl,
+  InputLabel,
   InputAdornment,
+  MenuItem,
+  Select,
   Switch,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
@@ -129,6 +134,9 @@ export default function SettingsPage() {
           <ButtonBase className={`settings-nav__item ${activeSection === "balance" ? "is-active" : ""}`} onClick={() => setActiveSection("balance")}>
             <Inventory2OutlinedIcon /><Box><strong>Balance rules</strong><span>Unpaid amounts</span></Box>
           </ButtonBase>
+          <ButtonBase className={`settings-nav__item ${activeSection === "date-time" ? "is-active" : ""}`} onClick={() => setActiveSection("date-time")}>
+            <CalendarMonthOutlinedIcon /><Box><strong>Date &amp; time</strong><span>Display preferences</span></Box>
+          </ButtonBase>
           <ButtonBase className={`settings-nav__item ${activeSection === "team" ? "is-active" : ""}`} onClick={() => setActiveSection("team")}>
             <GroupsOutlinedIcon /><Box><strong>Team &amp; permissions</strong><span>Pages and actions</span></Box>
           </ButtonBase>
@@ -193,6 +201,32 @@ export default function SettingsPage() {
               <Box className="settings-option__copy"><Typography component="h3">Allow balance due</Typography><Typography>Permit a cashier to close a bill with an unpaid remainder.</Typography></Box>
               <Box className="settings-option__control"><Typography>{settings.allowBalanceDue ? "On" : "Off"}</Typography>{settingSwitch("Allow remaining balance", settings.allowBalanceDue, (value) => updateSetting("allowBalanceDue", value))}</Box>
             </Box>
+          </Box>}
+
+          {activeSection === "date-time" && <Box className="settings-section">
+            <Box className="settings-section__heading"><Box><Typography className="settings-section__kicker">DISPLAY PREFERENCES</Typography><Typography component="h2">Date &amp; time format</Typography><Typography>Choose how dates and times appear throughout the app.</Typography></Box></Box>
+            <Box className="settings-field-row">
+              <FormControl sx={{ width: "min(250px, 100%)" }}>
+                <InputLabel id="date-format-label">Date format</InputLabel>
+                <Select labelId="date-format-label" label="Date format" value={settings.dateFormat} onChange={(event) => updateSetting("dateFormat", event.target.value)}>
+                  <MenuItem value="DD/MM/YYYY">DD/MM/YYYY</MenuItem>
+                  <MenuItem value="MM/DD/YYYY">MM/DD/YYYY</MenuItem>
+                  <MenuItem value="YYYY-MM-DD">Year-Month-Day (2026-11-09)</MenuItem>
+                  <MenuItem value="DD-MM-YYYY">Day-Month-Year (09-11-2026)</MenuItem>
+                  <MenuItem value="MM-DD-YYYY">Month-Day-Year (11-09-2026)</MenuItem>
+                  <MenuItem value="DD MMM YYYY">11 Nov 2026</MenuItem>
+                  <MenuItem value="MMMM DD, YYYY">November 11, 2026</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl sx={{ width: "min(250px, 100%)" }}>
+                <InputLabel id="time-format-label">Time format</InputLabel>
+                <Select labelId="time-format-label" label="Time format" value={settings.timeFormat} onChange={(event) => updateSetting("timeFormat", event.target.value)}>
+                  <MenuItem value="12-hour">12-hour (1:05 PM)</MenuItem>
+                  <MenuItem value="24-hour">24-hour (13:05)</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Typography className="settings-section__description">The selected formats are saved to POS settings and used across the app.</Typography>
           </Box>}
 
           {activeSection === "team" && <TeamPermissionsPanel />}

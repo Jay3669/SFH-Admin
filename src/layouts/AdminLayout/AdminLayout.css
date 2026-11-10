@@ -9,10 +9,12 @@
     isolation: isolate;
     display: flex;
     width: 100%;
-    min-height: 100svh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     flex-direction: column;
     padding: 1.25rem 0.9rem 1rem;
-    overflow: hidden auto;
+    overflow: hidden;
     background:
         radial-gradient(ellipse at 0% 6%, rgb(255 196 61 / 9%), transparent 38%),
         linear-gradient(160deg, #20283a 0%, #171e2e 54%, #141a29 100%);
@@ -151,8 +153,34 @@
     outline-offset: -2px;
 }
 
+.admin-sidebar__nav {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    scrollbar-color: rgb(245 201 85 / 38%) transparent;
+    scrollbar-width: thin;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgb(245 201 85 / 38%);
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb:hover {
+    background: rgb(245 201 85 / 65%);
+}
+
 .admin-sidebar__bottom {
     margin-top: auto;
+    flex-shrink: 0;
 }
 
 .admin-sidebar__bottom .MuiDivider-root {
@@ -265,6 +293,19 @@
     align-items: center;
     gap: 0.65rem;
     margin-left: 0.25rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-header__account:focus-visible {
+    outline: 2px solid #f5c955;
+    outline-offset: 3px;
+    border-radius: 0.35rem;
 }
 
 .admin-header__account-details {

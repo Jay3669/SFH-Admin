@@ -15,6 +15,7 @@ import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { getOrders, saveOrders } from "../../services/ordersManagement";
+import { formatTime } from "../../utils/dateTimeFormat";
 import "./OrdersManagementPage.css";
 
 const CURRENCY = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
@@ -30,7 +31,7 @@ function statusClass(status) {
 }
 
 function displayTime(value) {
-  return new Date(value).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  return formatTime(value);
 }
 
 export default function OrdersManagementPage() {
